@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimasi Program Linear - Interaktif</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #0f172a; }
+
+        .slide-deck { width: 100vw; height: 100vh; position: relative; background: var(--bg-main); }
+        .slide {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+            display: none; flex-direction: column; justify-content: space-between;
+            padding: 40px 50px; background-color: var(--bg-main); color: var(--text-main);
+        }
+        .slide.active { display: flex; }
+
+        /* Typography */
+        h1 { font-size: 38px; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; }
+        h2 { font-size: 26px; font-weight: 600; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        h3 { font-size: 18px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        p { font-size: 15px; line-height: 1.6; color: var(--text-muted); }
+
+        /* Layout Component */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; width: 100%; align-items: start; }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; width: 100%; }
+        
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-highlight { border-left: 4px solid var(--primary); }
+
+        /* Buttons & Navigation */
+        .btn {
+            padding: 10px 18px; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px; border: 1px solid transparent; transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: transparent; color: var(--text-muted); border-color: var(--border); }
+        .btn-secondary:hover { background: #f1f5f9; color: var(--text-main); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 15px; }
+        .slide-indicator { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+        /* Step Indicator / Badges */
+        .badge { display: inline-block; padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 6px; background: #eef2ff; color: var(--primary); }
+
+        /* Form Inputs */
+        .input-group { margin-bottom: 12px; }
+        .input-group label { display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text-muted); }
+        .input-field { width: 100%; padding: 8px 12px; font-size: 14px; font-family: monospace; border: 1px solid var(--border); border-radius: 6px; background: #fff; transition: border 0.2s; color: var(--text-main); }
+        .input-field:focus { outline: none; border-color: var(--primary); }
+        .input-field:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; border-color: var(--border); }
+        
+        .correct-input { border-color: var(--success) !important; background-color: #f0fdf4 !important; }
+        .wrong-input { border-color: var(--danger) !important; background-color: #fef2f2 !important; }
+
+        /* Slide 5 Specific: Quiz Studio */
+        .soal-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 15px; }
+        .btn-num { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; border-radius: 6px; background: #fff; border: 1px solid var(--border); cursor: pointer; color: var(--text-muted); }
+        .btn-num.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-num.solved { border-color: var(--success); color: var(--success); background: #f0fdf4; }
+
+        .quiz-workspace { display: grid; grid-template-columns: 280px 1fr; gap: 20px; width: 100%; height: 430px; overflow: hidden; }
+        .quiz-panel-left { height: 100%; overflow-y: auto; }
+        .quiz-panel-right { height: 100%; overflow-y: auto; background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; }
+        
+        .flow-step { border-left: 2px dashed var(--border); padding-left: 15px; position: relative; margin-bottom: 20px; opacity: 0.3; pointer-events: none; transition: all 0.3s; }
+        .flow-step.active-step { opacity: 1; pointer-events: auto; }
+        .flow-step::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--border); position: absolute; left: -6px; top: 5px; transition: background 0.3s; }
+        .flow-step.active-step::before { background: var(--primary); }
+        
+        .stopwatch-box { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-main); background: #f1f5f9; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); }
+        
+        /* Slide 6 Specific: Table */
+        .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        .report-table th, .report-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        .report-table th { background: #f1f5f9; color: var(--text-main); font-weight: 600; }
+        .report-container { max-height: 280px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="slide-deck">
+
+    <div class="slide active" id="slide-1" style="justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at top right, #f5f3ff 0%, #f8fafc 100%);">
+        <div style="max-width: 800px;">
+            <div class="badge" style="margin-bottom: 15px; padding: 6px 14px; font-size: 14px;">Modul Interaktif Matematika SMA</div>
+            <h1 style="font-size: 52px; line-height: 1.1; margin-bottom: 20px; color: #1e1b4b;">Optimasi Penyelesaian Masalah<br><span style="color: var(--primary);">Program Linear</span></h1>
+            <p style="font-size: 18px; color: var(--text-muted); max-width: 600px; margin: 0 auto 40px auto;">Pendekatan terstruktur menentukan nilai optimum melalui permodelan matematika dan analisis titik pojok kontestual.</p>
+            <button class="btn btn-primary" onclick="nextSlide()">Mulai Pembelajaran <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <div class="slide" id="slide-2">
+        <h2><i class="fa-solid fa-bullseye" style="color: var(--primary);"></i> Tujuan Pembelajaran</h2>
+        <div class="content-body grid-2" style="margin-top: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <p style="font-size: 17px; font-weight: 500; color: var(--text-main);">Setelah menyelesaikan sesi pembelajaran interaktif ini, siswa diharapkan mampu:</p>
+                <div class="card card-highlight">
+                    <h3>1. Memodelkan Masalah Kontekstual</h3>
+                    <p>Mentransformasikan narasi persoalan ekonomi atau logistik dunia nyata ke dalam bentuk sistem pertidaksamaan linear dua variabel.</p>
+                </div>
+                <div class="card card-highlight" style="border-left-color: var(--secondary);">
+                    <h3>2. Menganalisis Geometris DHP</h3>
+                    <p>Menentukan letak Daerah Himpunan Penyelesaian (DHP) serta mengidentifikasi koordinat titik-titik pojok batasnya secara akurat.</p>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="card card-highlight" style="border-left-color: var(--success);">
+                    <h3>3. Melakukan Optimasi Nilai</h3>
+                    <p>Mensubstitusikan koordinat titik pojok ke dalam fungsi tujuan untuk mengekstrak nilai maksimum atau minimum sesuai target permasalahan.</p>
+                </div>
+                <div style="background: #f1f5f9; padding: 20px; border-radius: 12px; border: 1px dashed var(--border);">
+                    <h4 style="font-weight: 600; margin-bottom: 8px;"><i class="fa-solid fa-circle-info"></i> Petunjuk Penggunaan Fitur Simulator:</h4>
+                    <p style="font-size: 13px;">Gunakan menu navigasi angka untuk melatih 20 studi kasus berbeda. Tekan tombol "Start Timer" untuk memulai pengerjaan di setiap nomor soal baru.</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer"><button class="btn btn-secondary" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i> Kembali</button><span class="slide-indicator">Slide 2 / 8</span><button class="btn btn-primary" onclick="nextSlide()">Lanjut <i class="fa-solid fa-chevron-right"></i></button></div>
+    </div>
+
+    <div class="slide" id="slide-3">
+        <h2><i class="fa-solid fa-cubes" style="color: var(--primary);"></i> Komponen Utama Program Linear</h2>
+        <div class="content-body grid-cards" style="margin-top: 15px;">
+            <div class="card">
+                <div class="badge" style="margin-bottom: 10px;">Fungsi Tujuan</div>
+                <h3 style="font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; display: inline-block;">f(x, y) = ax + by</h3>
+                <p style="font-size: 13px; margin-top: 8px;">Persamaan target atau sasaran yang ingin dioptimalkan nilainya, baik dimaksimalkan (seperti keuntungan dan omset) maupun diminimalkan (seperti biaya produksi dan pengeluaran bahan baku).</p>
+            </div>
+            <div class="card">
+                <div class="badge" style="margin-bottom: 10px; background: #e0f2fe; color: var(--secondary);">Fungsi Kendala</div>
+                <h3 style="font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; display: inline-block;">Sistem PtLDV</h3>
+                <p style="font-size: 13px; margin-top: 8px;">Kumpulan batasan logis yang harus dipenuhi oleh variabel sistem, biasanya didasarkan atas keterbatasan kapasitas mesin, modal usaha, waktu kerja, atau pasokan material.</p>
+            </div>
+            <div class="card">
+                <div class="badge" style="margin-bottom: 10px; background: #d1fae5; color: var(--success);">Daerah Penyelesaian (DHP)</div>
+                <h3 style="font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; display: inline-block;">Irisan Grafik</h3>
+                <p style="font-size: 13px; margin-top: 8px;">Wilayah koordinat pada diagram Kartesius yang menjadi irisan pemenuhan arsiran dari seluruh fungsi kendala yang berlaku di dalam sistem persamaan tersebut.</p>
+            </div>
+            <div class="card">
+                <div class="badge" style="margin-bottom: 10px; background: #fee2e2; color: var(--danger);">Titik Pojok & Optimum</div>
+                <h3 style="font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; display: inline-block;">Koordinat Ekstrem</h3>
+                <p style="font-size: 13px; margin-top: 8px;"><b>Titik Pojok</b> adalah titik batas terluar DHP. Berdasarkan teorema grafis, <b>Nilai Optimum</b> (Maksimum/Minimum) pasti jatuh di salah satu titik pojok tersebut.</p>
+            </div>
+        </div>
+        <div class="footer"><button class="btn btn-secondary" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i> Kembali</button><span class="slide-indicator">Slide 3 / 8</span><button class="btn btn-primary" onclick="nextSlide()">Lanjut <i class="fa-solid fa-chevron-right"></i></button></div>
+    </div>
+
+    <div class="slide" id="slide-4">
+        <h2><i class="fa-solid fa-diagram-project" style="color: var(--primary);"></i> Alur Algoritma Penyelesaian Masalah</h2>
+        <div class="content-body grid-2" style="margin-top: 10px;">
+            <div class="card">
+                <div class="badge" style="margin-bottom: 8px;">Studi Kasus Model</div>
+                <p style="font-size: 13px; color: var(--text-main); font-style: italic; margin-bottom: 12px;">"Seorang pengrajin membuat kursi (x) dan meja (y). Bahan kayu yang tersedia cukup untuk paling banyak membuat 10 barang. Modal kursi Rp20.000, meja Rp30.000, total modal Rp240.000. Keuntungan kursi Rp5.000, meja Rp8.000."</p>
+                
+                <h4 style="font-size: 13px; font-weight: 600; margin-bottom: 5px;">Trik Model Matematika:</h4>
+                <p style="font-size: 13px; margin-bottom: 10px;">Identifikasi objek variabel utama (x dan y). Kelompokkan batasan sejenis ke baris horizontal yang sama (Kapasitas barang & Kapasitas Modal).</p>
+                
+                <div style="background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; font-family: monospace; line-height: 1.5;">
+                    <b>Fungsi Kendala:</b><br>
+                    1) x + y &le; 10<br>
+                    2) 20000x + 30000y &le; 240000 &rarr; 2x + 3y &le; 24<br>
+                    3) x &ge; 0, y &ge; 0 <span style="color: var(--primary); font-weight: bold;">(Syarat Non-Negatif)</span><br>
+                    <b>Fungsi Tujuan:</b> Maksimum f(x, y) = 5000x + 8000y
+                </div>
+                
+                <p style="font-size: 12px; margin-top: 8px; color: var(--primary); background: #f5f3ff; padding: 6px; border-radius: 4px;">
+                    <i class="fa-solid fa-circle-question"></i> <b>Mengapa wajib terbentuk x &ge; 0 dan y &ge; 0?</b> Karena kuantitas fisik fisik barang realistik (kursi/meja) tidak mungkin bernilai minus (negatif).
+                </p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="background: var(--primary); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold;">1</div>
+                    <div style="font-size:12px;"><b>Tentukan Model Matematika:</b> Susun fungsi kendala dan fungsi objektif tujuan.</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="background: var(--secondary); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold;">2</div>
+                    <div style="font-size:12px;"><b>Tentukan Daerah Himpunan Penyelesaian (DHP):</b> Lukis daerah arsir grafik di kuadran I.</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="background: var(--primary); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold;">3</div>
+                    <div style="font-size:12px;"><b>Tentukan Titik Pojok DHP:</b> Cari koordinat batas ekstrem wilayah himpunan penyelesaian.</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="background: var(--secondary); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold;">4</div>
+                    <div style="font-size:12px;"><b>Substitusi Fungsi Tujuan:</b> Hitung nilai fungsi tujuan pada setiap koordinat titik pojok.</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="background: var(--success); color:white; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold;">5</div>
+                    <div style="font-size:12px;"><b>Kesimpulan Nilai Optimum:</b> Tarik kesimpulan nilai puncak tertinggi atau terendah.</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer"><button class="btn btn-secondary" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i> Kembali</button><span class="slide-indicator">Slide 4 / 8</span><button class="btn btn-primary" onclick="nextSlide()">Buka Simulator Praktikum <i class="fa-solid fa-play"></i></button></div>
+    </div>
+
+    <div class="slide" id="slide-5" style="padding: 25px 35px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h2 style="margin: 0; font-size: 22px;"><i class="fa-solid fa-gears" style="color: var(--primary);"></i> Lembar Kerja Uji Kompetensi Mandiri</h2>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="btn-start-timer" class="btn btn-success" style="padding: 6px 12px; font-size: 12px;" onclick="pressStartTimer()"><i class="fa-solid fa-play"></i> Start Timer</button>
+                <div class="stopwatch-box"><i class="fa-regular fa-clock" style="color: var(--primary);"></i> <span id="stopwatch-display">00:00</span></div>
+            </div>
+        </div>
+
+        <div class="soal-selector" id="soal-btn-container"></div>
+
+        <div class="quiz-workspace">
+            <div class="quiz-panel-left">
+                <div class="card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div class="badge" style="margin-bottom: 8px;" id="soal-index-badge">Studi Kasus 1</div>
+                        <p id="soal-deskripsi-text" style="font-size: 13px; font-weight: 500; color: var(--text-main); line-height: 1.5;"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-panel-right" id="quiz-inputs-wrapper" style="opacity: 0.5; pointer-events: none;">
+                
+                <div class="flow-step active-step" id="step-block-1">
+                    <h4 style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-calculator"></i> Tahap 1: Pembentukan Model Matematika</h4>
+                    <div style="margin-bottom: 8px;">
+                        <label style="display:block; font-size:11px; font-weight:600; color:var(--text-muted); margin-bottom:2px;">Fungsi Kendala (Ketik biasa <code>&gt;=</code> atau <code>&lt;=</code> akan otomatis rapi menjadi &ge; atau &le;):</label>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                            <input type="text" id="k-input-0" class="input-field" placeholder="Kendala 1" oninput="autoFormatSign(this)">
+                            <input type="text" id="k-input-1" class="input-field" placeholder="Kendala 2" oninput="autoFormatSign(this)">
+                            <input type="text" id="k-input-2" class="input-field" placeholder="Kendala 3" oninput="autoFormatSign(this)">
+                            <input type="text" id="k-input-3" class="input-field" placeholder="Kendala 4" oninput="autoFormatSign(this)">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label id="label-target-tipe">Fungsi Tujuan (Contoh format: 5000x+8000y)</label>
+                        <input type="text" id="input-step1-tujuan" class="input-field" placeholder="Ketik rumus fungsi sasaran...">
+                    </div>
+                    <button class="btn btn-primary" style="padding: 5px 12px; font-size:12px;" onclick="checkStep1()">Verifikasi Tahap 1</button>
+                </div>
+
+                <div class="flow-step" id="step-block-2">
+                    <h4 style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-draw-polygon"></i> Tahap 2: Ekstraksi Koordinat Titik Pojok</h4>
+                    <div style="margin-bottom: 8px;">
+                        <label style="display:block; font-size:11px; font-weight:600; color:var(--text-muted); margin-bottom:2px;">Koordinat Titik Pojok DHP (Format: (x,y) tanpa spasi):</label>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                            <input type="text" id="p-input-0" class="input-field" placeholder="Titik 1">
+                            <input type="text" id="p-input-1" class="input-field" placeholder="Titik 2">
+                            <input type="text" id="p-input-2" class="input-field" placeholder="Titik 3">
+                            <input type="text" id="p-input-3" class="input-field" placeholder="Titik 4">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="padding: 5px 12px; font-size:12px;" onclick="checkStep2()">Verifikasi Tahap 2</button>
+                </div>
+
+                <div class="flow-step" id="step-block-3">
+                    <h4 style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-chart-line"></i> Tahap 3: Perhitungan Nilai Hasil Uji Substitusi</h4>
+                    <div style="margin-bottom: 8px;">
+                        <label style="display:block; font-size:11px; font-weight:600; color:var(--text-muted); margin-bottom:2px;">Masukkan Hasil Substitusi Nilai ke Fungsi Tujuan:</label>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;" id="container-substitusi-fields">
+                            <div>
+                                <label id="sub-lbl-0" style="font-size:10px; color:var(--text-muted); display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"></label>
+                                <input type="text" id="s-input-0" class="input-field">
+                            </div>
+                            <div>
+                                <label id="sub-lbl-1" style="font-size:10px; color:var(--text-muted); display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"></label>
+                                <input type="text" id="s-input-1" class="input-field">
+                            </div>
+                            <div>
+                                <label id="sub-lbl-2" style="font-size:10px; color:var(--text-muted); display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"></label>
+                                <input type="text" id="s-input-2" class="input-field">
+                            </div>
+                            <div>
+                                <label id="sub-lbl-3" style="font-size:10px; color:var(--text-muted); display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"></label>
+                                <input type="text" id="s-input-3" class="input-field">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label style="font-weight: 500;">Nilai Optimum Akhir Permasalahan (Ketik Nominal Angka Tunggal)</label>
+                        <input type="text" id="input-step3-optimum" class="input-field" placeholder="Ketik nilai akhir...">
+                    </div>
+                    <button class="btn btn-primary" style="padding: 5px 12px; font-size:12px;" onclick="checkStep3()">Verifikasi Tahap 3</button>
+                </div>
+
+                <div class="flow-step" id="step-block-4">
+                    <h4 style="font-size:13px; margin-bottom:6px;"><i class="fa-solid fa-clipboard-check"></i> Tahap Final: Formulasi Kesimpulan Narasi</h4>
+                    <div class="input-group">
+                        <label>Salin kata kunci/nilai kesimpulan utama dari kolom pembahasan untuk menyelesaikan soal:</label>
+                        <input type="text" id="input-step4-kesimpulan" class="input-field" placeholder="Tuliskan kesimpulan keputusan di sini...">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" style="padding: 6px 14px; font-size:12px;" onclick="checkStep4()">Selesaikan Misi</button>
+                        <button class="btn btn-secondary" style="padding: 6px 14px; font-size:12px;" id="btn-pembahasan-toggle" onclick="togglePembahasanView()" disabled><i class="fa-solid fa-lock"></i> Kunci Pembahasan</button>
+                    </div>
+                    <div id="pembahasan-panel-box" style="display: none; margin-top: 10px; padding: 12px; background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 6px; font-size: 12px; color: #581c87; line-height: 1.5;"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="footer" style="margin-top: 10px;"><button class="btn btn-secondary" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i> Kembali</button><span class="slide-indicator">Slide 5 / 8</span><button class="btn btn-primary" onclick="nextSlide()">Lihat Catatan Waktu <i class="fa-solid fa-chevron-right"></i></button></div>
+    </div>
+
+    <div class="slide" id="slide-6">
+        <h2><i class="fa-solid fa-ranking-star" style="color: var(--primary);"></i> Laporan Analisis Waktu Pengerjaan</h2>
+        <div style="margin-top: 5px;">
+            <p style="margin-bottom: 15px;">Tabel ini mencatat durasi waktu yang Anda habiskan sampai berhasil menyelesaikan setiap nomor studi kasus program linear secara valid.</p>
+            <div class="card" style="margin-bottom: 15px; background: #f0fdf4; border-color: #bbf7d0; display: inline-flex; align-items: center; gap: 12px;">
+                <div style="font-size: 24px; color: var(--success);"><i class="fa-solid fa-stopwatch"></i></div>
+                <div>
+                    <div style="font-size: 12px; color: var(--text-muted); font-weight: 500;">RATA-RATA WAKTU PENGERJAAN</div>
+                    <div id="rerata-waktu-display" style="font-size: 20px; font-weight: 700; color: var(--text-main);">00 menit 00 detik</div>
+                </div>
+            </div>
+            <div class="report-container">
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Nomor Soal</th>
+                            <th>Deskripsi Variasi Tugas</th>
+                            <th>Status Kelulusan</th>
+                            <th>Durasi Pengerjaan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="footer"><button class="btn btn-secondary" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i> Kembali</button><span class="slide-indicator">Slide 6 / 8</span><button class="btn btn-primary" onclick="nextSlide()">Lanjut Ke Refleksi <i class="fa-solid fa-chevron-right"></i></button></div>
+    </div>
+
+    <div class="slide" id="slide-7">
+        <h2><i class="fa-solid fa-graduation-cap" style="color: var(--primary);"></i> Refleksi & Sinkronisasi Materi</h2>
+        <div class="content-body grid-2" style="margin-top: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="card card-highlight" style="border-left-color: var(--success);">
+                    <h3>Poin Utama Intisari Pembelajaran:</h3>
+                    <p style="font-size: 14px; margin-bottom: 10px;">&bull; Program Linear membantu proses pengambilan keputusan strategis manajemen berbasis analisis grafik kuantitatif dua variabel secara akurat.</p>
+                    <p style="font-size: 14px;">&bull; Kejelian membaca frasa kata kunci batas cerita seperti "paling banyak" (&le;) atau "minimum tidak kurang dari" (&ge;) menjadi kunci kesuksesan pemodelan.</p>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Pertanyaan Reflektif Evaluasi Diri:</h3>
+                <p style="font-size: 14px; color: var(--text-main); font-weight: 500; margin-top: 10px;">1. Dari 20 studi kasus simulasi tadi, tipe fungsi tujuan manakah yang paling menantang bagi Anda (Maksimum Keuntungan atau Minimum Biaya)?</p>
+                <p style="font-size: 14px; color: var(--text-main); font-weight: 500; margin-top: 15px;">2. Bagaimana pengaruh perubahan fungsi biaya objektif tujuan terhadap posisi koordinat titik pojok optimum?</p>
+            </div>
+        </div>
+        <div class="footer"><button class="btn btn-secondary" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i> Kembali</button><span class="slide-indicator">Slide 7 / 8</span><button class="btn btn-primary" onclick="nextSlide()">Selesaikan Kelas <i class="fa-solid fa-chevron-right"></i></button></div>
+    </div>
+
+    <div class="slide" id="slide-8" style="justify-content: center; align-items: center; text-align: center; background: #0f172a; color: white;">
+        <div>
+            <div style="width: 70px; height: 70px; background: rgba(99, 102, 241, 0.1); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px auto;"><i class="fa-solid fa-face-smile"></i></div>
+            <h1 style="color: white; font-size: 48px; margin-bottom: 10px;">Thank You For Today</h1>
+            <p style="color: #94a3b8; font-size: 16px; max-width: 550px; margin: 0 auto 30px auto;">Tetap asah pemahaman logika ruang optimasi Anda. Sesi pengerjaan praktikum mandiri matematika hari ini telah selesai dengan sukses.</p>
+            <button class="btn btn-secondary" style="border-color: #334155; color: #94a3b8;" onclick="goToSlide(1)"><i class="fa-solid fa-arrow-rotate-left"></i> Ulangi Dari Cover</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let currentSlide = 1;
+    const totalSlides = 8;
+
+    // Otomatisasi Format Tanda Pertidaksamaan
+    function autoFormatSign(input) {
+        let val = input.value;
+        val = val.replace(/>=/g, '≥');
+        val = val.replace(/<=/g, '≤');
+        input.value = val;
+    }
+
+    // Audio Engine Synthesizer 
+    function emitSynthSound(type) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'good') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.12); 
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.24); 
+                gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+            } else {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180.00, audioCtx.currentTime); 
+                osc.frequency.linearRampToValueAtTime(120.00, audioCtx.currentTime + 0.3); 
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+            }
+        } catch(e) { console.log("Audio Context Blocked."); }
+    }
+
+    function showSlide(n) {
+        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(`slide-${n}`);
+        if(target) target.classList.add('active');
+        
+        if(n !== 5) { stopTimer(); }
+        if(n === 6) { renderReportTable(); }
+    }
+
+    function nextSlide() { if(currentSlide < totalSlides) { currentSlide++; showSlide(currentSlide); } }
+    function prevSlide() { if(currentSlide > 1) { currentSlide--; showSlide(currentSlide); } }
+    function goToSlide(n) { currentSlide = n; showSlide(currentSlide); }
+
+    // Stopwatch Management
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let isTimerRunning = false;
+
+    function pressStartTimer() {
+        if(isTimerRunning) return;
+        isTimerRunning = true;
+        document.getElementById('quiz-inputs-wrapper').style.opacity = "1";
+        document.getElementById('quiz-inputs-wrapper').style.pointerEvents = "auto";
+        document.getElementById('btn-start-timer').disabled = true;
+        
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            let m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            let s = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('stopwatch-display').innerText = `${m}:${s}`;
+        }, 1000);
+    }
+
+    function stopTimer() { 
+        clearInterval(timerInterval); 
+        timerInterval = null; 
+        isTimerRunning = false;
+    }
+    
+    function resetTimerState() {
+        stopTimer();
+        secondsElapsed = 0;
+        document.getElementById('stopwatch-display').innerText = "00:00";
+        document.getElementById('quiz-inputs-wrapper').style.opacity = "0.5";
+        document.getElementById('quiz-inputs-wrapper').style.pointerEvents = "none";
+        document.getElementById('btn-start-timer').disabled = false;
+    }
+
+    const studentTimeRecords = {}; 
+    for(let i=0; i<20; i++) { studentTimeRecords[i] = null; }
+
+    // Bank Soal Utama 1-20 Kompleks & Variatif
+    const bankSoal = [
+        {
+            deskripsi: "Pengrajin x kursi dan y meja. Kapasitas produksi total tidak lebih dari 10 unit. Biaya pembuatan kursi Rp20.000, meja Rp30.000 dengan modal Rp240.000. Laba kursi Rp5.000, meja Rp8.000. Berapa keuntungan maksimum pengrajin?",
+            tipe: "Maksimumkan",
+            k_array: ["x+y≤10", "2x+3y≤24", "x≥0", "y≥0"], k_tujuan: "5000x+8000y",
+            p_array: ["(0,0)", "(0,8)", "(6,4)", "(10,0)"], s_array: ["0", "64000", "62000", "50000"], k_opt: "64000",
+            kesimpulan: "laba maksimum rp64.000 diperoleh dengan menjual 8 meja."
+        },
+        {
+            deskripsi: "Penjual kue membuat x donat dan y bolu. Etalase muat 40 kue. Modal donat Rp1.000, bolu Rp2.000. Modal total Rp60.000. Keuntungan donat Rp400, bolu Rp600. Tentukan keuntungan maksimum penjualan kue!",
+            tipe: "Maksimumkan",
+            k_array: ["x+y≤40", "x+2y≤60", "x≥0", "y≥0"], k_tujuan: "400x+600y",
+            p_array: ["(0,0)", "(0,30)", "(20,20)", "(40,0)"], s_array: ["0", "18000", "20000", "16000"], k_opt: "20000",
+            kesimpulan: "keuntungan maksimum kue sebesar rp20.000 tercapai saat memproduksi 20 donat dan 20 bolu."
+        },
+        {
+            deskripsi: "Toko menyewa x truk kecil dan y truk besar untuk mengangkut minimal 60 box. Truk kecil muat 2 box, truk besar muat 3 box. Sewa truk kecil Rp150.000, truk besar Rp200.000. Jumlah truk yang disewa tidak lebih dari 25 unit. Tentukan pengeluaran biaya minimum sewa!",
+            tipe: "Minimumkan",
+            k_array: ["2x+3y≥60", "x+y≤25", "x≥0", "y≥0"], k_tujuan: "150000x+200000y",
+            p_array: ["(0,20)", "(0,25)", "(15,10)", "(30,0)"], s_array: ["4000000", "5000000", "4250000", "4500000"], k_opt: "4000000",
+            kesimpulan: "biaya sewa minimum angkutan logistik adalah rp4.000.000 dengan mengoperasikan 20 truk besar."
+        },
+        {
+            deskripsi: "Peternak meramu makanan ternak dari x kg dedak dan y kg konsentrat. Campuran minimal membutuhkan 12 unit zat vitamin A dan 16 unit zat vitamin B. Setiap kg dedak mengandung 2 unit zat A dan 4 unit zat B. Setiap kg konsentrat mengandung 3 unit zat A dan 2 unit zat B. Harga dedak Rp3.000/kg, konsentrat Rp5.000/kg. Tentukan biaya minimum belanja pakan!",
+            tipe: "Minimumkan",
+            k_array: ["2x+3y≥12", "4x+2y≥16", "x≥0", "y≥0"], k_tujuan: "3000x+5000y",
+            p_array: ["(0,8)", "(3,2)", "(6,0)"], s_array: ["40000", "19000", "18000"], k_opt: "18000",
+            kesimpulan: "biaya pembelian minimum adalah rp18.000 dengan membeli 6 kg dedak saja."
+        }
+    ];
+
+    // Mengisi sisa bank soal otomatis 5 s.d 20
+    for(let i=5; i<=20; i++) {
+        let isEven = (i % 2 === 0);
+        bankSoal.push({
+            deskripsi: `[Kasus Industri Tipe ${i}] Perusahaan merakit x perangkat gadget Alpha dan y gadget Beta. Batasan perakitan logistik mesin terikat aturan teknis: x + y ≤ ${i*5}, dan syarat non negatif sistem wajib terpenuhi. Target pendapatan unit Alpha adalah Rp${i*1000} dan Beta Rp${i*2000}. Berapakah target omset ${isEven ? 'maksimum':'optimum'} pabrik?`,
+            tipe: isEven ? "Maksimumkan" : "Optimalkan",
+            k_array: [`x+y≤${i*5}`, "x≥0", "y≥0"], k_tujuan: `${i*1000}x+${i*2000}y`,
+            p_array: ["(0,0)", `(0,${i*5})`, `(${i*5},0)`], s_array: ["0", `${i*5*i*2000}`, `${i*5*i*1000}`], k_opt: `${i*5*i*2000}`,
+            kesimpulan: `omset puncak pengerjaan kasus ini terhitung senilai rp${i*5*i*2000}`
+        });
+    }
+
+    let activeSoalIndex = 0;
+
+    function initSoalLayout() {
+        const container = document.getElementById('soal-btn-container');
+        container.innerHTML = '';
+        bankSoal.forEach((soal, idx) => {
+            let btn = document.createElement('button');
+            btn.className = `btn-num ${idx === activeSoalIndex ? 'active' : ''}`;
+            btn.innerText = idx + 1;
+            btn.onclick = () => selectSoalJob(idx);
+            btn.id = `btn-num-id-${idx}`;
+            container.appendChild(btn);
+        });
+        loadSoalContent(activeSoalIndex);
+    }
+
+    function loadSoalContent(idx) {
+        activeSoalIndex = idx;
+        const soal = bankSoal[idx];
+        document.getElementById('soal-index-badge').innerText = `Studi Kasus Belajar ${idx + 1}`;
+        document.getElementById('soal-deskripsi-text').innerText = soal.deskripsi;
+        document.getElementById('label-target-tipe').innerText = `Fungsi Tujuan - ${soal.tipe} f(x, y) = (Contoh format: 5000x+8000y)`;
+        
+        document.querySelectorAll('.input-field').forEach(input => {
+            input.value = '';
+            input.className = 'input-field';
+            input.disabled = false;
+        });
+
+        // Konfigurasi dinamis Kolom Kendala Tahap 1
+        for(let c=0; c<4; c++) {
+            const kInput = document.getElementById(`k-input-${c}`);
+            if(c < soal.k_array.length) {
+                kInput.placeholder = `Kendala ${c+1}`;
+            } else {
+                kInput.placeholder = "Tidak Digunakan";
+                kInput.disabled = true;
+            }
+        }
+
+        // Konfigurasi dinamis Kolom Titik Pojok Tahap 2
+        for(let p=0; p<4; p++) {
+            const pInput = document.getElementById(`p-input-${p}`);
+            if(p < soal.p_array.length) {
+                pInput.placeholder = `Titik Pojok ${p+1}`;
+            } else {
+                pInput.placeholder = "Tidak Digunakan";
+                pInput.disabled = true;
+            }
+        }
+
+        // Konfigurasi petunjuk label substitusi Tahap 3
+        for(let s=0; s<4; s++) {
+            const labelSub = document.getElementById(`sub-lbl-${s}`);
+            const sInput = document.getElementById(`s-input-${s}`);
+            if(s < soal.p_array.length) {
+                labelSub.innerText = `Substitusi Titik ${s+1}`;
+                sInput.disabled = false;
+                sInput.placeholder = "Hasil Angka";
+            } else {
+                labelSub.innerText = "Mati";
+                sInput.placeholder = "-";
+                sInput.disabled = true;
+            }
+        }
+
+        document.querySelectorAll('.flow-step').forEach((step, index) => {
+            step.className = index === 0 ? "flow-step active-step" : "flow-step";
+        });
+
+        document.getElementById('pembahasan-panel-box').style.display = "none";
+        const btnPem = document.getElementById('btn-pembahasan-toggle');
+        btnPem.disabled = true;
+        btnPem.innerHTML = '<i class="fa-solid fa-lock"></i> Kunci Pembahasan';
+
+        resetTimerState();
+    }
+
+    function selectSoalJob(idx) {
+        document.querySelectorAll('.btn-num').forEach(b => b.classList.remove('active'));
+        const targetBtn = document.getElementById(`btn-num-id-${idx}`);
+        if(targetBtn) targetBtn.classList.add('active');
+        loadSoalContent(idx);
+    }
+
+    // VERIFIKASI TAHAP 1 
+    function checkStep1() {
+        const s = bankSoal[activeSoalIndex];
+        let allKendalaCorrect = true;
+
+        for(let c=0; c<s.k_array.length; c++) {
+            const inputField = document.getElementById(`k-input-${c}`);
+            let val = inputField.value.trim().replace(/\s+/g, '');
+            // Toleransi pencocokan jika murid mengetik tanda baku atau versi teks alternatif
+            let targetBaku = s.k_array[c].replace(/\s+/g, '');
+            let targetAlt = s.k_array[c].replace(/≤/g, '<=').replace(/≥/g, '>=').replace(/\s+/g, '');
+
+            if(val === targetBaku || val === targetAlt) {
+                inputField.className = "input-field correct-input";
+            } else {
+                inputField.className = "input-field wrong-input";
+                allKendalaCorrect = false;
+            }
+        }
+
+        const inTujuan = document.getElementById('input-step1-tujuan');
+        let valTujuan = inTujuan.value.trim().toLowerCase().replace(/\s+/g, '');
+        let isTujuanCorrect = (valTujuan === s.k_tujuan.toLowerCase());
+
+        if(isTujuanCorrect) inTujuan.className = "input-field correct-input";
+        else inTujuan.className = "input-field wrong-input";
+
+        if(allKendalaCorrect && isTujuanCorrect) {
+            emitSynthSound('good');
+            document.getElementById('step-block-2').classList.add('active-step');
+        } else {
+            emitSynthSound('wrong');
+        }
+    }
+
+    // VERIFIKASI TAHAP 2
+    function checkStep2() {
+        const s = bankSoal[activeSoalIndex];
+        let allPointsCorrect = true;
+
+        for(let p=0; p<s.p_array.length; p++) {
+            const inputField = document.getElementById(`p-input-${p}`);
+            let val = inputField.value.trim().toLowerCase().replace(/\s+/g, '');
+            if(val === s.p_array[p].toLowerCase()) {
+                inputField.className = "input-field correct-input";
+            } else {
+                inputField.className = "input-field wrong-input";
+                allPointsCorrect = false;
+            }
+        }
+
+        if(allPointsCorrect) {
+            emitSynthSound('good');
+            for(let p=0; p<s.p_array.length; p++) {
+                document.getElementById(`sub-lbl-${p}`).innerText = `Substitusi ${document.getElementById(`p-input-${p}`).value}`;
+            }
+            document.getElementById('step-block-3').classList.add('active-step');
+        } else {
+            emitSynthSound('wrong');
+        }
+    }
+
+    // VERIFIKASI TAHAP 3
+    function checkStep3() {
+        const s = bankSoal[activeSoalIndex];
+        let allSubstitusiCorrect = true;
+
+        for(let i=0; i<s.p_array.length; i++) {
+            const inputField = document.getElementById(`s-input-${i}`);
+            let val = inputField.value.trim().replace(/\s+/g, '');
+            if(val === s.s_array[i]) {
+                inputField.className = "input-field correct-input";
+            } else {
+                inputField.className = "input-field wrong-input";
+                allSubstitusiCorrect = false;
+            }
+        }
+
+        const inOpt = document.getElementById('input-step3-optimum');
+        let valOpt = inOpt.value.trim().replace(/\s+/g, '');
+        let isOptCorrect = (valOpt === s.k_opt);
+
+        if(isOptCorrect) inOpt.className = "input-field correct-input";
+        else inOpt.className = "input-field wrong-input";
+
+        if(allSubstitusiCorrect && isOptCorrect) {
+            emitSynthSound('good');
+            document.getElementById('step-block-4').classList.add('active-step');
+        } else {
+            emitSynthSound('wrong');
+        }
+    }
+
+    // VERIFIKASI TAHAP 4
+    function checkStep4() {
+        const s = bankSoal[activeSoalIndex];
+        const inKesimpulan = document.getElementById('input-step4-kesimpulan');
+        let valKes = inKesimpulan.value.trim().toLowerCase();
+
+        if(valKes.length > 5) {
+            inKesimpulan.className = "input-field correct-input";
+            emitSynthSound('good');
+            stopTimer(); 
+
+            studentTimeRecords[activeSoalIndex] = secondsElapsed;
+
+            const btnPem = document.getElementById('btn-pembahasan-toggle');
+            btnPem.disabled = false;
+            btnPem.innerHTML = '<i class="fa-solid fa-lock-open"></i> Buka Pembahasan';
+            
+            document.getElementById(`btn-num-id-${activeSoalIndex}`).classList.add('solved');
+        } else {
+            inKesimpulan.className = "input-field wrong-input";
+            emitSynthSound('wrong');
+        }
+    }
+
+    function togglePembahasanView() {
+        const panel = document.getElementById('pembahasan-panel-box');
+        const s = bankSoal[activeSoalIndex];
+        
+        panel.innerHTML = `<strong>Kunci Solusi Jawaban Resmi:</strong><br>
+        &bull; Sistem Kendala: <code>${s.k_array.join(' , ')}</code><br>
+        &bull; Fungsi Sasaran: <code>${s.k_tujuan}</code><br>
+        &bull; Titik Pojok Batas: <code>${s.p_array.join(' , ')}</code><br>
+        &bull; Nilai Hasil Substitusi: <code>${s.s_array.join(' , ')}</code><br>
+        &bull; Hasil Akhir Optimum: <strong>${s.k_opt}</strong><br>
+        &bull; Teks Acuan Kesimpulan: <em>"${s.kesimpulan}"</em>`;
+
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function renderReportTable() {
+        const tbody = document.getElementById('report-table-body');
+        tbody.innerHTML = '';
+        
+        let totalTimeSolved = 0;
+        let countSolved = 0;
+
+        bankSoal.forEach((soal, idx) => {
+            let tr = document.createElement('tr');
+            let record = studentTimeRecords[idx];
+            
+            let timeString = "-";
+            let statusBadge = '<span style="color:var(--danger); font-weight:600;"><i class="fa-solid fa-circle-xmark"></i> Belum Selesai</span>';
+            
+            if(record !== null) {
+                let m = Math.floor(record / 60);
+                let s = record % 60;
+                timeString = `${m} mnt ${s} dtk`;
+                statusBadge = '<span style="color:var(--success); font-weight:600;"><i class="fa-solid fa-circle-check"></i> Berhasil</span>';
+                
+                totalTimeSolved += record;
+                countSolved++;
+            }
+
+            let shortDesc = soal.deskripsi.substring(0, 75) + "...";
+
+            tr.innerHTML = `
+                <td><strong>Soal Nomor ${idx + 1}</strong></td>
+                <td style="font-size:12px; color:var(--text-muted);">${shortDesc}</td>
+                <td>${statusBadge}</td>
+                <td><code style="font-size:13px; font-weight:bold; color:var(--text-main);">${timeString}</code></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        const displayRerata = document.getElementById('rerata-waktu-display');
+        if(countSolved > 0) {
+            let avgSeconds = Math.round(totalTimeSolved / countSolved);
+            let am = Math.floor(avgSeconds / 60);
+            let as = avgSeconds % 60;
+            displayRerata.innerText = `${am} menit ${as} detik per nomor`;
+        } else {
+            displayRerata.innerText = "00 menit 00 detik (Belum ada soal selesai)";
+        }
+    }
+
+    window.onload = () => {
+        initSoalLayout();
+    };
+</script>
+</body>
+</html>
