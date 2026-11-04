@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program Linear — Slide Interaktif | Matematika Kelas X Kurikulum Merdeka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+/* ============ DASAR ============ */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Poppins','Segoe UI',system-ui,sans-serif;
+  background:linear-gradient(135deg,#eef2ff 0%,#f5f3ff 45%,#fdf2f8 100%);
+  color:#1e293b; overflow:hidden;
+}
+:root{
+  --pri:#6366f1; --pri-dark:#4f46e5; --vio:#8b5cf6; --pink:#ec4899;
+  --amber:#f59e0b; --green:#10b981; --red:#ef4444; --cyan:#06b6d4;
+  --ink:#1e293b; --muted:#64748b; --card:#ffffff; --line:#e2e8f0;
+  --shadow:0 10px 30px rgba(99,102,241,.14);
+  --radius:22px;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #a5b4fc;outline-offset:2px}
+em, .var{font-style:italic;font-weight:600}
+
+/* ============ DEKORASI LATAR ============ */
+.bg-deco{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:drift 18s ease-in-out infinite alternate}
+.blob.b1{width:420px;height:420px;background:#c7d2fe;top:-120px;left:-100px}
+.blob.b2{width:360px;height:360px;background:#ddd6fe;bottom:-120px;right:-80px;animation-delay:-6s}
+.blob.b3{width:280px;height:280px;background:#fbcfe8;top:40%;left:70%;animation-delay:-12s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,26px) scale(1.08)}}
+
+/* ============ BILAH ATAS ============ */
+.topbar{position:fixed;top:0;left:0;right:0;height:58px;display:flex;align-items:center;gap:14px;
+  padding:0 16px;z-index:60;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(99,102,241,.15)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--pri-dark);font-size:.95rem;white-space:nowrap}
+.brand .logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--pri),var(--pink));
+  display:grid;place-items:center;color:#fff;font-size:1rem;box-shadow:0 4px 12px rgba(139,92,246,.4)}
+.top-spacer{flex:1}
+.icon-btn{width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid var(--line);
+  font-size:1.15rem;display:grid;place-items:center;transition:.2s;box-shadow:0 2px 8px rgba(30,41,59,.06)}
+.icon-btn:hover{transform:translateY(-2px);border-color:var(--pri);color:var(--pri-dark)}
+
+/* ============ DAFTAR ISI ============ */
+.toc-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:70;opacity:0;pointer-events:none;transition:.25s}
+.toc-overlay.open{opacity:1;pointer-events:auto}
+.toc{position:fixed;top:0;right:-360px;width:340px;max-width:88vw;height:100%;background:#fff;z-index:71;
+  box-shadow:-12px 0 40px rgba(15,23,42,.18);transition:right .3s cubic-bezier(.2,.8,.2,1);
+  display:flex;flex-direction:column;border-radius:24px 0 0 24px}
+.toc.open{right:0}
+.toc-head{padding:18px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.toc-head h3{font-size:1.02rem;color:var(--pri-dark)}
+.toc-list{flex:1;overflow-y:auto;padding:10px 14px 24px}
+.toc-group{margin-top:12px;font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94a3b8;padding:0 8px}
+.toc-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 10px;border-radius:12px;
+  font-size:.86rem;color:#334155;transition:.15s;font-weight:500}
+.toc-item:hover{background:#eef2ff;color:var(--pri-dark)}
+.toc-item.now{background:linear-gradient(90deg,#e0e7ff,#ede9fe);color:var(--pri-dark);font-weight:700}
+.toc-item .num{min-width:26px;height:26px;border-radius:9px;background:#f1f5f9;display:grid;place-items:center;
+  font-size:.72rem;font-weight:700;color:#64748b}
+.toc-item.now .num{background:linear-gradient(135deg,var(--pri),var(--vio));color:#fff}
+
+/* ============ PANGGUNG SLIDE ============ */
+.stage{position:fixed;inset:58px 0 0 0;z-index:10}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transform:translateX(46px) scale(.985);
+  transition:opacity .45s ease,transform .45s cubic-bezier(.2,.8,.2,1);overflow:hidden}
+.slide.active{opacity:1;pointer-events:auto;transform:none;z-index:5}
+.wrap{width:min(1160px,94vw);max-height:calc(100vh - 96px);overflow-y:auto;padding:26px 30px 34px;
+  scrollbar-width:thin;scrollbar-color:#c7d2fe transparent}
+.wrap::-webkit-scrollbar{width:8px}
+.wrap::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:8px}
+
+/* ============ TIPOGRAFI & ELEMEN UMUM ============ */
+.kicker{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#e0e7ff,#fce7f3);
+  color:var(--pri-dark);font-weight:700;font-size:.78rem;padding:7px 16px;border-radius:999px;letter-spacing:.05em;
+  border:1px solid #e0e7ff;margin-bottom:14px}
+h1.slide-title{font-size:clamp(1.5rem,3.4vw,2.3rem);font-weight:800;line-height:1.2;color:#312e81;margin-bottom:8px}
+h1.slide-title .grad{background:linear-gradient(90deg,var(--pri-dark),var(--vio),var(--pink));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.slide-sub{color:var(--muted);font-size:.98rem;margin-bottom:20px;max-width:860px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;border:1px solid #f1f5f9}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mt{margin-top:18px}
+.muted{color:var(--muted)}
+.small{font-size:.82rem}
+.center{text-align:center}
+
+/* kotak rumus/matematika */
+.math{background:#f8faff;border:1.5px dashed #c7d2fe;border-radius:16px;padding:14px 18px;
+  font-size:1.06rem;line-height:1.75;color:#312e81}
+.math b{color:var(--pri-dark)}
+.math .big{font-size:1.2em;font-weight:700}
+.fbox{background:linear-gradient(135deg,#eef2ff,#fdf2f8);border:2px solid #c7d2fe;border-radius:18px;
+  padding:16px 20px;font-size:1.12rem;font-weight:700;color:#3730a3;box-shadow:0 6px 18px rgba(99,102,241,.12)}
+.fx{font-family:'Cambria Math','STIX Two Math',Georgia,serif;font-style:italic}
+
+/* tombol */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;
+  padding:12px 22px;border-radius:15px;font-size:.95rem;transition:.2s;border:2px solid transparent}
+.btn-primary{background:linear-gradient(135deg,var(--pri),var(--vio));color:#fff;
+  box-shadow:0 8px 20px rgba(99,102,241,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(99,102,241,.45)}
+.btn-ghost{background:#fff;border-color:#c7d2fe;color:var(--pri-dark)}
+.btn-ghost:hover{background:#eef2ff}
+.btn-success{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 8px 20px rgba(16,185,129,.3)}
+.btn-success:hover{transform:translateY(-2px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-link{background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;box-shadow:0 8px 20px rgba(37,99,235,.32)}
+.btn-link:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(37,99,235,.42)}
+
+/* lencana & chip */
+.chip{display:inline-flex;align-items:center;gap:6px;background:#eef2ff;color:#4338ca;border-radius:999px;
+  padding:5px 13px;font-size:.78rem;font-weight:600;border:1px solid #e0e7ff}
+.chip.g{background:#d1fae5;color:#065f46;border-color:#a7f3d0}
+.chip.p{background:#fce7f3;color:#9d174d;border-color:#fbcfe8}
+.chip.a{background:#fef3c7;color:#92400e;border-color:#fde68a}
+
+/* kartu langkah bernomor */
+.stepnum{min-width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--pri),var(--vio));
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.05rem;box-shadow:0 5px 14px rgba(99,102,241,.35)}
+
+/* tabel */
+table.nice{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;
+  box-shadow:0 4px 14px rgba(30,41,59,.08);font-size:.9rem}
+table.nice th{background:linear-gradient(90deg,var(--pri),var(--vio));color:#fff;padding:10px 12px;font-weight:600;text-align:center}
+table.nice td{padding:9px 12px;border-bottom:1px solid #eef2ff;text-align:center}
+table.nice tr:last-child td{border-bottom:none}
+table.nice tr.hl td{background:#fef9c3;font-weight:700}
+
+/* ============ KUIS ============ */
+.quiz{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #f1f5f9;overflow:hidden}
+.quiz-top{display:flex;align-items:center;gap:12px;padding:15px 22px;background:linear-gradient(90deg,#eef2ff,#fdf2f8);
+  border-bottom:1px solid #eef2ff;flex-wrap:wrap}
+.quiz-top .qt{font-weight:800;color:#3730a3}
+.score-chip{margin-left:auto;background:linear-gradient(135deg,var(--amber),#f97316);color:#fff;font-weight:700;
+  padding:7px 16px;border-radius:999px;font-size:.85rem;box-shadow:0 4px 12px rgba(249,115,22,.35)}
+.quiz-body{padding:22px 26px 26px}
+.qmeta{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.qcount{font-size:.8rem;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.qtext{font-size:1.06rem;line-height:1.7;margin-bottom:16px;font-weight:500}
+.qtext .fx{color:#4338ca}
+.qopts{display:grid;gap:10px}
+.qopt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#f8fafc;border:2px solid #e2e8f0;
+  border-radius:15px;padding:12px 15px;font-size:.96rem;transition:.18s;font-weight:500;color:#334155}
+.qopt:hover:not(:disabled){border-color:#a5b4fc;background:#eef2ff;transform:translateX(4px)}
+.qopt .letter{min-width:32px;height:32px;border-radius:10px;background:#e2e8f0;color:#475569;display:grid;
+  place-items:center;font-weight:800;font-size:.85rem;transition:.18s}
+.qopt.picked{border-color:var(--pri);background:#eef2ff}
+.qopt.picked .letter{background:var(--pri);color:#fff}
+.qopt.correct{border-color:var(--green)!important;background:#ecfdf5!important;animation:pop .35s}
+.qopt.correct .letter{background:var(--green);color:#fff}
+.qopt.wrong{border-color:var(--red)!important;background:#fef2f2!important;animation:shake .4s}
+.qopt.wrong .letter{background:var(--red);color:#fff}
+.qopt:disabled{cursor:default;opacity:1}
+.qinput-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.qinput{padding:12px 16px;border:2px solid #e2e8f0;border-radius:14px;font-size:1.05rem;font-weight:600;
+  width:190px;font-family:inherit;color:#312e81;background:#f8fafc}
+.qinput:focus{border-color:var(--pri);background:#fff}
+.qinput.ok{border-color:var(--green);background:#ecfdf5}
+.qinput.bad{border-color:var(--red);background:#fef2f2}
+.qacts{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.qexp{display:none;margin-top:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fde68a;
+  border-radius:16px;padding:14px 18px;font-size:.93rem;line-height:1.7;animation:fadeUp .4s}
+.qexp.show{display:block}
+.qexp .qh{font-weight:800;color:#92400e;margin-bottom:5px}
+.qfeed{margin-top:14px;padding:12px 16px;border-radius:14px;font-weight:700;display:none;animation:fadeUp .35s}
+.qfeed.good{display:block;background:#ecfdf5;color:#065f46;border:1.5px solid #a7f3d0}
+.qfeed.bad{display:block;background:#fef2f2;color:#991b1b;border:1.5px solid #fecaca}
+.qdots{display:flex;gap:7px;flex-wrap:wrap}
+.qdot{width:26px;height:26px;border-radius:9px;background:#e2e8f0;color:#64748b;font-size:.7rem;font-weight:700;
+  display:grid;place-items:center;transition:.2s}
+.qdot.cur{background:var(--pri);color:#fff;transform:scale(1.12)}
+.qdot.right{background:var(--green);color:#fff}
+.qdot.wrong{background:var(--red);color:#fff}
+.qresult{display:none;text-align:center;padding:34px 20px;animation:fadeUp .5s}
+.qresult.show{display:block}
+.qresult .bigscore{font-size:3.2rem;font-weight:800;background:linear-gradient(90deg,var(--pri),var(--pink));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.qresult .msg{font-size:1.05rem;margin:10px 0 20px;color:#475569}
+
+/* ============ WIDGET INTERAKTIF ============ */
+.iw{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #f1f5f9;padding:18px 20px}
+.iw-title{font-weight:800;color:#3730a3;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:1rem}
+.graph-svg{width:100%;height:auto;display:block;border-radius:14px;background:#fbfcff}
+.gctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.gctrl select,.gctrl input[type=number]{padding:10px 12px;border:2px solid #e2e8f0;border-radius:12px;
+  font-family:inherit;font-size:.9rem;font-weight:600;color:#334155;background:#f8fafc}
+.gbadge{fill:#fff;stroke:#c7d2fe}
+.gbadge-t{font-size:11.5px;font-weight:700;fill:#4338ca}
+
+/* kartu aplikasi M1 (flip) */
+.appgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.appcard{perspective:900px;height:172px;cursor:pointer}
+.appinner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}
+.appcard.flip .appinner{transform:rotateY(180deg)}
+.appface{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;padding:16px;display:flex;
+  flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 8px 22px rgba(99,102,241,.16)}
+.appface.front{background:linear-gradient(145deg,#eef2ff,#fdf2f8);border:1.5px solid #e0e7ff}
+.appface.front .ico{font-size:2.1rem;margin-bottom:8px}
+.appface.front .t{font-weight:700;color:#3730a3;font-size:.92rem}
+.appface.front .hint{font-size:.7rem;color:#94a3b8;margin-top:7px}
+.appface.back{background:linear-gradient(145deg,var(--pri),var(--vio));color:#fff;transform:rotateY(180deg);
+  font-size:.76rem;line-height:1.55;padding:14px}
+.appface.back b{color:#fde68a}
+
+/* highlight cerita M2 */
+.story{background:#fffdf5;border:1.5px solid #fde68a;border-radius:18px;padding:18px 20px;line-height:2.05;font-size:.98rem}
+.hl{cursor:pointer;padding:3px 7px;border-radius:9px;transition:.2s;border-bottom:2px dashed transparent}
+.hl:hover{background:#fef9c3}
+.hl.on-var{background:#e0e7ff;color:#3730a3;border-bottom-color:#818cf8;font-weight:600}
+.hl.on-kendala{background:#ffe4e6;color:#9f1239;border-bottom-color:#fb7185;font-weight:600}
+.hl.on-tujuan{background:#d1fae5;color:#065f46;border-bottom-color:#34d399;font-weight:600}
+.modelrow{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:14px;border:2px solid #f1f5f9;
+  transition:.25s;margin-bottom:9px;background:#f8fafc;cursor:pointer}
+.modelrow.hot-var{border-color:#818cf8;background:#eef2ff}
+.modelrow.hot-kendala{border-color:#fb7185;background:#fff1f2}
+.modelrow.hot-tujuan{border-color:#34d399;background:#ecfdf5}
+.modelrow .mtag{font-size:.68rem;font-weight:800;letter-spacing:.06em;padding:4px 9px;border-radius:8px;white-space:nowrap}
+.mtag.var{background:#e0e7ff;color:#4338ca}
+.mtag.kendala{background:#ffe4e6;color:#be123c}
+.mtag.tujuan{background:#d1fae5;color:#047857}
+
+/* akordeon langkah M7 */
+.acc{border:1.5px solid #e0e7ff;border-radius:16px;margin-bottom:11px;overflow:hidden;background:#fff}
+.acc-h{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;text-align:left;font-weight:700;
+  color:#3730a3;font-size:.95rem;transition:.2s;background:#f8faff}
+.acc-h:hover{background:#eef2ff}
+.acc-b{display:none;padding:15px 18px;border-top:1.5px dashed #e0e7ff;background:#fff;line-height:1.75;font-size:.93rem}
+.acc.open .acc-b{display:block;animation:fadeUp .35s}
+.acc.open .chev{transform:rotate(180deg)}
+.chev{margin-left:auto;transition:.3s;color:#818cf8}
+
+/* kartu contoh M6 */
+.excard{border:1.5px solid #e0e7ff;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(99,102,241,.1)}
+.excard .exh{padding:12px 16px;background:linear-gradient(90deg,#eef2ff,#fdf2f8);font-weight:700;color:#3730a3;font-size:.92rem}
+
+/* refleksi */
+.moodrow{display:flex;gap:10px;flex-wrap:wrap}
+.mood{font-size:1.9rem;width:62px;height:62px;border-radius:18px;background:#f8fafc;border:2px solid #e2e8f0;
+  transition:.2s;display:grid;place-items:center}
+.mood:hover{transform:translateY(-4px) scale(1.06)}
+.mood.sel{border-color:var(--pri);background:#eef2ff;box-shadow:0 8px 18px rgba(99,102,241,.25);transform:scale(1.1)}
+.checkline{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:#f8fafc;
+  margin-bottom:8px;font-size:.88rem;transition:.2s;cursor:pointer;border:1.5px solid #f1f5f9}
+.checkline:hover{background:#eef2ff}
+.checkline input{width:19px;height:19px;accent-color:var(--pri);cursor:pointer}
+.checkline.done{background:#ecfdf5;border-color:#a7f3d0}
+textarea.rt{width:100%;min-height:74px;border:2px solid #e2e8f0;border-radius:14px;padding:11px 14px;font-family:inherit;
+  font-size:.9rem;resize:vertical;background:#f8fafc;color:#334155}
+textarea.rt:focus{border-color:var(--pri);background:#fff}
+
+/* penutup / thankyou */
+.thanks-title{font-size:clamp(2.2rem,6vw,4rem);font-weight:800;text-align:center;line-height:1.15;
+  background:linear-gradient(90deg,#4f46e5,#8b5cf6,#ec4899,#f59e0b);background-size:220% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite}
+@keyframes shine{to{background-position:220% center}}
+.floaty{position:absolute;font-size:2.2rem;opacity:.75;animation:floaty 6s ease-in-out infinite;pointer-events:none}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-20px) rotate(6deg)}}
+.confetti{position:fixed;top:-14px;z-index:200;border-radius:3px;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
+
+/* cover */
+.cover{display:grid;grid-template-columns:1.15fr .85fr;gap:30px;align-items:center;width:min(1160px,94vw)}
+.cover .bigtitle{font-size:clamp(2.3rem,5.6vw,4rem);font-weight:800;line-height:1.08;
+  background:linear-gradient(90deg,#4f46e5,#7c3aed,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
+.chips{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0 22px}
+.idline{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.idbox{background:rgba(255,255,255,.85);border:1.5px solid #e0e7ff;border-radius:15px;padding:11px 17px;min-width:150px}
+.idbox .lab{font-size:.68rem;font-weight:700;color:#94a3b8;letter-spacing:.07em;text-transform:uppercase}
+.idbox .val{font-weight:700;color:#3730a3;font-size:.95rem;outline:none;border-radius:6px;padding:2px 4px}
+.idbox .val:focus{background:#eef2ff;box-shadow:0 0 0 2px #a5b4fc}
+.cover-art{background:#fff;border-radius:28px;box-shadow:0 24px 60px rgba(99,102,241,.22);padding:18px;border:1px solid #eef2ff}
+
+/* navigasi bawah */
+.navbtns{position:fixed;bottom:18px;right:22px;display:flex;gap:10px;z-index:65}
+.navbtn{width:52px;height:52px;border-radius:17px;background:linear-gradient(135deg,var(--pri),var(--vio));color:#fff;
+  font-size:1.3rem;display:grid;place-items:center;box-shadow:0 10px 24px rgba(99,102,241,.4);transition:.2s}
+.navbtn:hover{transform:translateY(-3px) scale(1.05)}
+.navbtn:disabled{opacity:.4;transform:none;box-shadow:none}
+.slide-hint{position:fixed;bottom:26px;left:26px;font-size:.75rem;color:#94a3b8;z-index:65;background:rgba(255,255,255,.7);
+  padding:6px 13px;border-radius:999px;border:1px solid #e2e8f0;backdrop-filter:blur(6px)}
+
+/* animasi umum */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.96)}55%{transform:scale(1.03)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.slide.active .anim{animation:fadeUp .55s both}
+.slide.active .anim.d1{animation-delay:.1s}
+.slide.active .anim.d2{animation-delay:.22s}
+.slide.active .anim.d3{animation-delay:.34s}
+.slide.active .anim.d4{animation-delay:.46s}
+
+/* responsif */
+@media (max-width:920px){
+  .grid2,.grid3,.appgrid{grid-template-columns:1fr}
+  .cover{grid-template-columns:1fr;text-align:center}
+  .chips,.idline{justify-content:center}
+  .appcard{height:auto;min-height:150px}
+  .wrap{padding:18px 14px 80px}
+  .slide-hint{display:none}
+  .navbtns{bottom:12px;right:12px}
+}
+</style>
+</head>
+<body>
+<div class="bg-deco"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<header class="topbar">
+  <div class="brand"><span class="logo">📈</span> Program Linear <span style="color:#94a3b8;font-weight:500">• Kelas X</span></div>
+  <div class="top-spacer"></div>
+  <button class="icon-btn" id="menuBtn" title="Daftar isi (M)" aria-label="Buka daftar isi">☰</button>
+</header>
+
+<div class="toc-overlay" id="tocOverlay"></div>
+<aside class="toc" id="toc" aria-label="Daftar isi">
+  <div class="toc-head"><h3>📚 Daftar Isi</h3><button class="icon-btn" id="tocClose" aria-label="Tutup daftar isi">✕</button></div>
+  <nav class="toc-list" id="tocList"></nav>
+</aside>
+
+<main class="stage" id="stage">
+
+<!-- ================= SLIDE 1 : COVER ================= -->
+<section class="slide" data-group="Pembuka" data-title="Cover">
+  <div class="cover">
+    <div class="anim">
+      <span class="kicker">✨ Matematika • Fase E • Kurikulum Merdeka</span>
+      <h1 class="bigtitle">Program<br>Linear</h1>
+      <div class="chips">
+        <span class="chip">🎯 Optimasi Maksimum &amp; Minimum</span>
+        <span class="chip g">🧮 Fungsi Kendala &amp; Tujuan</span>
+        <span class="chip p">📍 Titik Pojok</span>
+      </div>
+      <p class="muted" style="max-width:520px">Belajar mengambil <b>keputusan terbaik</b> dengan bantuan matematika: dari uang jajan, produksi roti, sampai rencana bisnis. Interaktif, mendalam, dan seru! 🚀</p>
+      <div class="idline">
+        <div class="idbox"><div class="lab">Nama Guru</div><div class="val" contenteditable="true" spellcheck="false">________________</div></div>
+        <div class="idbox"><div class="lab">Sekolah</div><div class="val" contenteditable="true" spellcheck="false">________________</div></div>
+        <div class="idbox"><div class="lab">Kelas / Tahun</div><div class="val" contenteditable="true" spellcheck="false">X / 20___</div></div>
+      </div>
+      <div style="margin-top:26px"><button class="btn btn-primary" id="startBtn" style="font-size:1.05rem;padding:14px 30px">🚀 Mulai Belajar</button></div>
+    </div>
+    <div class="cover-art anim d2" aria-hidden="true">
+      <svg viewBox="0 0 420 330" class="graph-svg">
+        <defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
+        <g stroke="#e2e8f0" stroke-width="1">
+          <line x1="40" y1="40" x2="40" y2="290"/><line x1="40" y1="240" x2="400" y2="240"/><line x1="40" y1="190" x2="400" y2="190"/>
+          <line x1="40" y1="140" x2="400" y2="140"/><line x1="40" y1="90" x2="400" y2="90"/>
+          <line x1="100" y1="40" x2="100" y2="290"/><line x1="160" y1="40" x2="160" y2="290"/><line x1="220" y1="40" x2="220" y2="290"/>
+          <line x1="280" y1="40" x2="280" y2="290"/><line x1="340" y1="40" x2="340" y2="290"/>
+        </g>
+        <polygon points="60,280 340,280 60,100" fill="url(#cg)" opacity=".18" stroke="#6366f1" stroke-width="0"/>
+        <line x1="60" y1="280" x2="340" y2="280" stroke="#4338ca" stroke-width="3"/>
+        <line x1="60" y1="280" x2="60" y2="100" stroke="#4338ca" stroke-width="3"/>
+        <line x1="60" y1="100" x2="340" y2="280" stroke="#4338ca" stroke-width="3"/>
+        <circle cx="60" cy="280" r="6" fill="#4f46e5"/><circle cx="340" cy="280" r="6" fill="#ec4899"/><circle cx="60" cy="100" r="6" fill="#8b5cf6"/>
+        <text x="52" y="298" font-size="12" fill="#475569" font-weight="700">O</text>
+        <text x="332" y="298" font-size="12" fill="#475569" font-weight="700">(6,0)</text>
+        <text x="66" y="96" font-size="12" fill="#475569" font-weight="700">(0,6)</text>
+        <text x="150" y="215" font-size="15" fill="#4338ca" font-weight="800" font-style="italic">daerah penyelesaian</text>
+        <text x="250" y="170" font-size="13" fill="#be185d" font-weight="800" font-style="italic" transform="rotate(28 250 170)">x + y = 6</text>
+        <circle cx="185" cy="232" r="7" fill="#f59e0b" opacity=".9"><animate attributeName="r" values="6;9;6" dur="2s" repeatCount="indefinite"/></circle>
+        <text x="196" y="237" font-size="12" fill="#92400e" font-weight="800">titik pojok ⭐</text>
+      </svg>
+      <p class="center small muted" style="margin-top:6px">Nilai terbaik selalu menunggu di <b>titik pojok</b>! ⭐</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 2 : APERSEPSI ================= -->
+<section class="slide" data-group="Pembuka" data-title="Apersepsi: Uang Jajan">
+  <div class="wrap">
+    <span class="kicker">🔥 Pemanasan Otak</span>
+    <h1 class="slide-title">Apersepsi: <span class="grad">Tantangan Uang Jajan Rp20.000</span> 🍜🥤</h1>
+    <p class="slide-sub">Bayangkan: kantin menjual <b>bakso Rp10.000</b> dan <b>jus Rp5.000</b>. Uangmu hanya <b>Rp20.000</b>. Geser slider di bawah — coba temukan semua kombinasi pembelian yang <i>tidak melebihi</i> uangmu!</p>
+    <div class="grid2">
+      <div class="iw anim">
+        <div class="iw-title">🎛️ Simulasi Kantin</div>
+        <label style="font-weight:600;font-size:.9rem">🍜 Bakso (Rp10.000/porsi): <span id="apXv" style="color:#4338ca">1</span></label>
+        <input type="range" id="apX" min="0" max="2" step="1" value="1" style="width:100%;accent-color:#6366f1;margin:6px 0 14px">
+        <label style="font-weight:600;font-size:.9rem">🥤 Jus (Rp5.000/gelas): <span id="apYv" style="color:#4338ca">1</span></label>
+        <input type="range" id="apY" min="0" max="4" step="1" value="1" style="width:100%;accent-color:#ec4899;margin:6px 0 14px">
+        <div class="fbox" style="text-align:center">
+          <span class="fx">f</span>(x, y) = 10<span class="fx">x</span> + 5<span class="fx">y</span> = <span id="apTot">15</span> (ribuan rupiah)
+        </div>
+        <div id="apStat" class="chip g" style="margin-top:12px;width:100%;justify-content:center;font-size:.9rem">✅ Masih sesuai anggaran (≤ 20)</div>
+        <button class="btn btn-ghost" id="apAll" style="margin-top:12px;width:100%">👀 Berapa banyak kombinasi yang memenuhi?</button>
+        <div id="apCombos" class="qexp"></div>
+        <p class="small muted" style="margin-top:10px">Kendala: <b>10x + 5y ≤ 20</b>, dengan x, y ≥ 0. Pernahkah kamu sadar sedang menyelesaikan <b>program linear</b>? 😉</p>
+      </div>
+      <div>
+        <div class="card anim d1">
+          <div class="iw-title">🤔 Pertanyaan Pemantik</div>
+          <div style="display:grid;gap:10px">
+            <div class="checkline" style="cursor:default">💡 <b>Berapa banyak</b> kombinasi bakso-jus yang bisa kamu beli? Satu? Dua? Atau <i>banyak sekali</i>?</div>
+            <div class="checkline" style="cursor:default">💡 Kalau tujuanmu <b>kenyang maksimal</b> dengan uang pas, kombinasi mana yang kamu pilih?</div>
+            <div class="checkline" style="cursor:default">💡 Kalau seorang <b>pemilik pabrik</b> punya masalah yang mirip — bahan terbatas, keuntungan ingin maksimal — bagaimana ia menghitungnya?</div>
+          </div>
+        </div>
+        <div class="card anim d2" style="margin-top:16px;background:linear-gradient(135deg,#eef2ff,#fdf2f8)">
+          <p style="font-size:.93rem;line-height:1.7">🎉 Masalah uang jajan tadi adalah <b>program linear versi mini</b>: ada <b>kendala</b> (uang terbatas) dan ada <b>tujuan</b> (kepuasan maksimal). Hari ini kita naik level: menyelesaikan masalah yang sama untuk <b>pabrik, bisnis, dan kehidupan nyata</b> dengan grafik dan titik pojok!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 3 : TUJUAN PEMBELAJARAN ================= -->
+<section class="slide" data-group="Pembuka" data-title="Tujuan Pembelajaran">
+  <div class="wrap">
+    <span class="kicker">🗺️ Peta Perjalanan Kita</span>
+    <h1 class="slide-title">Tujuan Pembelajaran <span class="grad">— Setelah Ini Kamu Bisa…</span></h1>
+    <p class="slide-sub">Selaras dengan Capaian Pembelajaran Matematika Fase E (elemen Aljabar), Kurikulum Merdeka.</p>
+    <div class="grid3">
+      <div class="card anim" style="border-top:5px solid #6366f1"><div style="font-size:1.7rem">📖</div><b>1. Menjelaskan konsep</b><p class="small muted" style="margin-top:6px">Menjelaskan pengertian program linear dan penerapannya dalam kehidupan sehari-hari.</p></div>
+      <div class="card anim d1" style="border-top:5px solid #8b5cf6"><div style="font-size:1.7rem">🧩</div><b>2. Membentuk model</b><p class="small muted" style="margin-top:6px">Menentukan variabel keputusan, fungsi kendala, dan fungsi tujuan dari masalah kontekstual.</p></div>
+      <div class="card anim d2" style="border-top:5px solid #ec4899"><div style="font-size:1.7rem">📊</div><b>3. Menggambar grafik</b><p class="small muted" style="margin-top:6px">Membentuk grafik daerah penyelesaian dari fungsi kendala (cara daerah bersih &amp; daerah kotor).</p></div>
+      <div class="card anim d3" style="border-top:5px solid #f59e0b"><div style="font-size:1.7rem">📍</div><b>4. Menentukan titik pojok</b><p class="small muted" style="margin-top:6px">Menemukan titik-titik pojok daerah penyelesaian menggunakan eliminasi &amp; substitusi.</p></div>
+      <div class="card anim d4" style="border-top:5px solid #10b981"><div style="font-size:1.7rem">🏆</div><b>5. Menentukan nilai optimum</b><p class="small muted" style="margin-top:6px">Menghitung nilai maksimum/minimum fungsi tujuan dan menafsirkan solusinya.</p></div>
+      <div class="card anim d4" style="border-top:5px solid #06b6d4"><div style="font-size:1.7rem">🔍</div><b>6. Membaca grafik</b><p class="small muted" style="margin-top:6px">Menentukan bentuk pertidaksamaan dari grafik daerah penyelesaian yang diberikan.</p></div>
+    </div>
+    <div class="fbox anim d4" style="margin-top:18px;text-align:center">
+      🛤️ Alur belajar: <b>Ingat kembali</b> → <b>Konsep</b> → <b>Model</b> → <b>Grafik</b> → <b>Titik pojok</b> → <b>Nilai optimum</b> → <b>Soal cerita</b>
+    </div>
+  </div>
+</section>
+<!-- ================= SLIDE 4 : MENGINGAT KEMBALI ================= -->
+<section class="slide" data-group="Pembuka" data-title="Ingat Kembali: Pertidaksamaan Linear">
+  <div class="wrap">
+    <span class="kicker">🧠 Cek Ingatan</span>
+    <h1 class="slide-title">Ingat Kembali: <span class="grad">Pertidaksamaan Linear Dua Variabel</span></h1>
+    <p class="slide-sub">Materi ini adalah <b>pondasi</b> program linear. Kilas balik singkat — kalau masih goyah, buka materi interaktifnya lewat tombol di bawah!</p>
+    <div class="grid2">
+      <div class="card anim">
+        <div class="iw-title">📌 Bentuk Umum &amp; Garis Batas</div>
+        <div class="math">Bentuk umum: <b>ax + by ≤ c</b> &nbsp;(tanda bisa &lt;, &gt;, ≤, atau ≥)<br>
+        Garis batas: <b>ax + by = c</b> — gambar garisnya dengan mencari titik potong sumbu:<br>
+        • potong sumbu-x → <b>y = 0</b> &nbsp;&nbsp;• potong sumbu-y → <b>x = 0</b></div>
+        <div class="math" style="margin-top:10px">Contoh: <b>2x + 3y ≤ 12</b> → garis 2x + 3y = 12 memotong sumbu-x di <b>(6, 0)</b> dan sumbu-y di <b>(0, 4)</b>.</div>
+      </div>
+      <div class="card anim d1">
+        <div class="iw-title">🎨 Daerah Penyelesaian &amp; Jenis Garis</div>
+        <div style="display:grid;gap:9px;font-size:.92rem">
+          <div class="checkline" style="cursor:default">🧪 <b>Titik uji (0,0):</b> substitusikan ke pertidaksamaan. Benar → daerah <b>memuat</b> (0,0); salah → daerah di <b>seberangnya</b>.</div>
+          <div class="checkline" style="cursor:default">━━ <b>Tanda ≤ atau ≥</b> → garis batas digambar <b>penuh</b> (titik pada garis ikut memenuhi).</div>
+          <div class="checkline" style="cursor:default">╌╌ <b>Tanda &lt; atau &gt;</b> → garis batas <b>putus-putus</b> (titik pada garis tidak memenuhi).</div>
+          <div class="checkline" style="cursor:default">∩ <b>Irisan daerah</b> = daerah yang memenuhi <b>semua</b> pertidaksamaan sekaligus.</div>
+        </div>
+      </div>
+    </div>
+    <div class="card anim d2 mt" style="background:linear-gradient(135deg,#eff6ff,#eef2ff);border:1.5px solid #bfdbfe;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      <div style="font-size:2.2rem">🔗</div>
+      <div style="flex:1;min-width:260px">
+        <b style="color:#1e40af">Materi Prasyarat Interaktif</b>
+        <p class="small" style="color:#3b5aa0;margin-top:3px">Masih perlu latihan pertidaksamaan linear? Klik tombol ini untuk membuka slide interaktif <i>Pertidaksamaan Linear</i> di tab baru:</p>
+      </div>
+      <a class="btn btn-link" href="https://nandarizky0407-bot.github.io/Pertidaksamaan-Linear/pertidaksamaan-linear-interaktif.html" target="_blank" rel="noopener">👉 Buka Materi Pertidaksamaan Linear</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 5 : PEMANASAN 5 SOAL ================= -->
+<section class="slide" data-group="Pembuka" data-title="Pemanasan: 5 Soal Kilat">
+  <div class="wrap" style="width:min(880px,96vw)">
+    <span class="kicker">⚡ Quiz Pemanasan</span>
+    <h1 class="slide-title">5 Soal Kilat: <span class="grad">Seberapa Siap Kamu?</span></h1>
+    <p class="slide-sub">Pilih jawaban lalu klik <b>Periksa Jawaban</b> — pembahasan langsung muncul. Tidak ada nilai yang dicatat, santai saja! 😄</p>
+    <div class="quiz-mount" data-quiz="review"></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 6 : M1a DEFINISI ================= -->
+<section class="slide" data-group="Materi 1" data-title="M1: Apa itu Program Linear?">
+  <div class="wrap">
+    <span class="kicker">📘 Materi 1 — Konsep Dasar</span>
+    <h1 class="slide-title">Apa Itu <span class="grad">Program Linear?</span></h1>
+    <div class="grid2">
+      <div>
+        <div class="card anim">
+          <div class="fbox" style="text-align:center;margin-bottom:14px">Program Linear adalah teknik matematika untuk mencari nilai <b>maksimum</b> atau <b>minimum</b> dari suatu fungsi (fungsi tujuan) yang syarat-syaratnya dinyatakan dalam <b>pertidaksamaan linear</b> (fungsi kendala).</div>
+          <div class="math">📖 <b>Bedah kata:</b><br>
+          • <b>Program</b> = rencana / susunan keputusan yang optimal (bukan program komputer! 💻)<br>
+          • <b>Linear</b> = semua hubungannya berupa persamaan/pertidaksamaan berpangkat satu (<span class="fx">ax + by</span>, bukan <span class="fx">x²</span>)</div>
+        </div>
+        <div class="card anim d1" style="margin-top:14px">
+          <div class="iw-title">🕰️ Fakta Sejarah Singkat</div>
+          <p style="font-size:.92rem;line-height:1.7">Pada 1939, <b>Leonid Kantorovich</b> (Uni Soviet) memakai ide ini untuk mengatur produksi pabrik — ia peraih Nobel Ekonomi 1975 🏅. Tahun 1947, <b>George Dantzig</b> (AS) menciptakan <i>metode simpleks</i>, hingga kini dipakai maskapai penerbangan, pabrik makanan, hingga logistik e-commerce!</p>
+        </div>
+      </div>
+      <div>
+        <div class="card anim d1">
+          <div class="iw-title">🔑 Tiga Kata Kunci Wajib Hafal</div>
+          <div style="display:grid;gap:11px">
+            <div class="modelrow"><span class="mtag var">VARIABEL</span><span style="font-size:.9rem">Nilai yang <b>belum diketahui</b> dan akan kita cari — biasanya <b>x</b> dan <b>y</b> (misal: banyak roti cokelat &amp; keju).</span></div>
+            <div class="modelrow hot-kendala" style="border-color:#fbcfe8;background:#fff1f2"><span class="mtag kendala">KENDALA</span><span style="font-size:.9rem"><b>Batasan-batasan</b> masalah: bahan, waktu, uang, kapasitas → ditulis sebagai pertidaksamaan.</span></div>
+            <div class="modelrow hot-tujuan" style="border-color:#a7f3d0;background:#ecfdf5"><span class="mtag tujuan">TUJUAN</span><span style="font-size:.9rem">Hal yang ingin <b>dioptimalkan</b>: keuntungan maksimum atau biaya minimum → fungsi <b>f(x, y) = ax + by</b>.</span></div>
+          </div>
+        </div>
+        <div class="iw anim d2" style="margin-top:14px">
+          <div class="iw-title">🧭 Dua Jenis Masalah</div>
+          <div class="grid2" style="gap:10px">
+            <div class="card" style="box-shadow:none;background:#ecfdf5;border:1.5px solid #a7f3d0;text-align:center"><b style="font-size:1.15rem">⬆️ MAKSIMUM</b><p class="small" style="margin-top:4px">Keuntungan terbesar, hasil panen terbanyak, nilai tertinggi…</p></div>
+            <div class="card" style="box-shadow:none;background:#fff7ed;border:1.5px solid #fed7aa;text-align:center"><b style="font-size:1.15rem">⬇️ MINIMUM</b><p class="small" style="margin-top:4px">Biaya termurah, waktu tersingkat, bahan paling hemat…</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 7 : M1b APLIKASI ================= -->
+<section class="slide" data-group="Materi 1" data-title="M1: Program Linear di Sekitar Kita">
+  <div class="wrap">
+    <span class="kicker">🌏 Terhubung Dunia Nyata</span>
+    <h1 class="slide-title">Program Linear <span class="grad">di Sekitar Kita</span> — Klik Kartunya!</h1>
+    <p class="slide-sub">Enam contoh penerapan. <b>Klik setiap kartu untuk membalik</b> dan lihat di mana kendala dan tujuannya. 👆</p>
+    <div class="appgrid">
+      <div class="appcard anim" tabindex="0"><div class="appinner">
+        <div class="appface front"><div class="ico">🏭</div><div class="t">Produksi Pabrik</div><div class="hint">klik untuk membalik ↻</div></div>
+        <div class="appface back"><b>Kendala:</b> mesin, tenaga kerja, bahan baku terbatas.<br><b>Tujuan:</b> keuntungan maksimum dari kombinasi produk. Contoh: pabrik roti menentukan banyak roti cokelat vs keju.</div>
+      </div></div>
+      <div class="appcard anim d1" tabindex="0"><div class="appinner">
+        <div class="appface front"><div class="ico">🥗</div><div class="t">Menu Diet Sehat</div><div class="hint">klik untuk membalik ↻</div></div>
+        <div class="appface back"><b>Kendala:</b> kebutuhan kalori, protein, vitamin minimum.<br><b>Tujuan:</b> biaya menu <b>minimum</b>. Dipakai rumah sakit &amp; katering untuk menyusun menu murah bergizi.</div>
+      </div></div>
+      <div class="appcard anim d2" tabindex="0"><div class="appinner">
+        <div class="appface front"><div class="ico">🚚</div><div class="t">Logistik &amp; Pengiriman</div><div class="hint">klik untuk membalik ↻</div></div>
+        <div class="appface back"><b>Kendala:</b> kapasitas truk, berat barang, jam operasional.<br><b>Tujuan:</b> biaya kirim minimum atau barang terkirim maksimum. Dipakai e-commerce &amp; kurir!</div>
+      </div></div>
+      <div class="appcard anim d2" tabindex="0"><div class="appinner">
+        <div class="appface front"><div class="ico">💰</div><div class="t">Anggaran &amp; Tabungan</div><div class="hint">klik untuk membalik ↻</div></div>
+        <div class="appface back"><b>Kendala:</b> uang saku terbatas, harga tiap kebutuhan.<br><b>Tujuan:</b> manfaat/jumlah barang maksimum. Seperti tantangan kantin di apersepsi tadi!</div>
+      </div></div>
+      <div class="appcard anim d3" tabindex="0"><div class="appinner">
+        <div class="appface front"><div class="ico">🏃</div><div class="t">Latihan Olahraga</div><div class="hint">klik untuk membalik ↻</div></div>
+        <div class="appface back"><b>Kendala:</b> waktu latihan maksimal, batas kalori terbakar.<br><b>Tujuan:</b> pembakaran kalori/kekuatan maksimum dari kombinasi jenis latihan.</div>
+      </div></div>
+      <div class="appcard anim d3" tabindex="0"><div class="appinner">
+        <div class="appface front"><div class="ico">📚</div><div class="t">Waktu Belajar</div><div class="hint">klik untuk membalik ↻</div></div>
+        <div class="appface back"><b>Kendala:</b> total jam belajar, energi harian.<br><b>Tujuan:</b> total nilai/soal yang terkuasai maksimum. Belajar pintar = optimasi! 🎓</div>
+      </div></div>
+    </div>
+    <div class="fbox mt anim d4" style="text-align:center">💬 Coba sebutkan satu masalahmu sendiri yang punya <b>kendala</b> dan <b>tujuan</b> — diskusikan dengan teman sebangku!</div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 8 : M1 QUIZ ================= -->
+<section class="slide" data-group="Materi 1" data-title="M1: Latihan 10 Soal">
+  <div class="wrap" style="width:min(920px,96vw)">
+    <span class="kicker">✏️ Latihan Materi 1</span>
+    <h1 class="slide-title">Latihan: <span class="grad">Konsep &amp; Penerapan Program Linear</span></h1>
+    <p class="slide-sub">10 soal pilihan ganda &amp; isian. Jawab, periksa, baca pembahasannya — ulangi sampai paham! 💪</p>
+    <div class="quiz-mount" data-quiz="m1"></div>
+  </div>
+</section>
+<!-- ================= SLIDE 9 : M2a VARIABEL & KENDALA ================= -->
+<section class="slide" data-group="Materi 2" data-title="M2: Variabel Keputusan & Fungsi Kendala">
+  <div class="wrap">
+    <span class="kicker">📘 Materi 2 — Membentuk Model</span>
+    <h1 class="slide-title">Variabel Keputusan &amp; <span class="grad">Fungsi Kendala</span></h1>
+    <p class="slide-sub">👆 Klik kata <span style="background:#fef9c3;padding:2px 7px;border-radius:8px;font-weight:700">berwarna di cerita</span> — lalu lihat kartu model di kanan ikut menyala! 🔍</p>
+    <div class="grid2">
+      <div class="story anim">
+        <b>📖 Kasus: Toko Roti "Manis Lezat"</b><br><br>
+        Toko membuat roti <span class="hl" data-part="var"><b>cokelat</b></span> dan <span class="hl" data-part="var"><b>keju</b></span>.
+        Setiap roti cokelat memakai <span class="hl" data-part="kendala"><b>2 kg tepung</b></span> dan roti keju <span class="hl" data-part="kendala"><b>1 kg tepung</b></span>, sementara tepung yang tersedia hanya <span class="hl" data-part="kendala"><b>12 kg</b></span>.
+        Setiap roti (cokelat maupun keju) dipanggang <span class="hl" data-part="kendala"><b>1 jam di oven</b></span>, dan oven tersedia <span class="hl" data-part="kendala"><b>8 jam</b></span>.
+        Keuntungan roti cokelat <span class="hl" data-part="tujuan"><b>Rp8.000</b></span> dan roti keju <span class="hl" data-part="tujuan"><b>Rp6.000</b></span> per buah.
+        Tentukan produksi agar keuntungan <span class="hl" data-part="tujuan"><b>maksimum</b></span>!
+      </div>
+      <div class="anim d1">
+        <div class="modelrow" data-part="var"><span class="mtag var">LANGKAH 1 • VARIABEL</span>
+          <span style="font-size:.92rem">Misalkan: <b>x</b> = banyak roti cokelat, <b>y</b> = banyak roti keju. Inilah <i>variabel keputusan</i> — keputusan yang harus diambil.</span></div>
+        <div class="modelrow" data-part="kendala"><span class="mtag kendala">LANGKAH 2 • KENDALA</span>
+          <span style="font-size:.92rem">Tepung: <b>2x + y ≤ 12</b> &nbsp;|&nbsp; Oven: <b>x + y ≤ 8</b> &nbsp;|&nbsp; Produksi tak mungkin negatif: <b>x ≥ 0, y ≥ 0</b> (kendala non-negatif).</span></div>
+        <div class="modelrow" data-part="tujuan"><span class="mtag tujuan">LANGKAH 3 • TUJUAN</span>
+          <span style="font-size:.92rem">Keuntungan (ribuan Rp): <b>f(x, y) = 8x + 6y</b> → cari nilai <b>maksimum</b>-nya.</span></div>
+        <div class="iw" style="margin-top:6px">
+          <div class="iw-title">💡 Kenapa Kendala Selalu Punya "≤"?</div>
+          <p class="small" style="line-height:1.7">Karena tepung <i>tidak bisa dipakai lebih</i> dari yang tersedia (2x + y tidak boleh melebihi 12), dan oven <i>tidak bisa menyala lebih lama</i> dari 8 jam. Kata kuncinya: <b>maksimal, paling banyak, tidak lebih dari, tersedia</b> → tanda <b>≤</b>. Sedangkan <b>minimal, sekurang-kurangnya, paling sedikit</b> → tanda <b>≥</b>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 10 : M2b FUNGSI TUJUAN ================= -->
+<section class="slide" data-group="Materi 2" data-title="M2: Fungsi Tujuan">
+  <div class="wrap">
+    <span class="kicker">📘 Materi 2 — Membentuk Model</span>
+    <h1 class="slide-title">Fungsi Tujuan: <span class="grad">"Kompas" yang Mau Kioptimalkan</span></h1>
+    <div class="grid2">
+      <div class="card anim">
+        <div class="iw-title">🎯 Definisi &amp; Bentuk</div>
+        <div class="math">Fungsi tujuan: <b>f(x, y) = ax + by</b><br>
+        <span class="small">• a = kontribusi tiap satuan x terhadap tujuan<br>• b = kontribusi tiap satuan y terhadap tujuan</span></div>
+        <div class="math" style="margin-top:10px">Contoh (toko roti): f(x, y) = <b>8</b>x + <b>6</b> y<br><span class="small">berarti setiap roti cokelat menambah keuntungan 8 (ribuan Rp), roti keju menambah 6 (ribuan Rp).</span></div>
+        <div class="iw" style="margin-top:12px;background:#fffbeb;border:1.5px solid #fde68a;box-shadow:none">
+          <div class="iw-title">⚠️ Jebakan Umum</div>
+          <p class="small" style="line-height:1.65">Satuan harus <b>seragam</b>! Kalau untung dalam ribuan rupiah, tulis 8x + 6y (bukan 8000x) — atau 8000x + 6000y dalam rupiah. Jangan campur! 🙅</p>
+        </div>
+      </div>
+      <div class="anim d1">
+        <div class="iw">
+          <div class="iw-title">🛠️ Praktik: Ubah Kalimat Jadi Model</div>
+          <table class="nice">
+            <tr><th>Kalimat Masalah</th><th>Model Matematika</th></tr>
+            <tr><td style="text-align:left">"Maksimal 30 jam pemakaian mesin, tiap produk butuh 3 jam"</td><td><b>3x ≤ 30</b></td></tr>
+            <tr><td style="text-align:left">"Modal paling banyak Rp500.000, barang A Rp20.000, B Rp10.000"</td><td><b>20x + 10y ≤ 500</b> <span class="small muted">(ribuan)</span></td></tr>
+            <tr><td style="text-align:left">"Sekurang-kurangnya 10 unit gabungan"</td><td><b>x + y ≥ 10</b></td></tr>
+            <tr><td style="text-align:left">"Untung Rp5.000/unit A, Rp7.000/unit B"</td><td><b>f = 5x + 7y</b> → maks</td></tr>
+            <tr><td style="text-align:left">"Biaya Rp4.000/unit A, Rp3.000/unit B, hematkan!"</td><td><b>f = 4x + 3y</b> → min</td></tr>
+          </table>
+        </div>
+        <div class="card anim d2" style="margin-top:14px;background:linear-gradient(135deg,#ecfdf5,#eef2ff)">
+          <div class="iw-title">🧪 Uji Pemahaman Kilat</div>
+          <p style="font-size:.92rem;line-height:1.7">"Sebuah angkot hanya muat 12 penumpang. Penumpang kelas ekonomi x dan VIP y." Kendalanya?<br>
+          <span class="chip g" style="margin-top:8px">Jawab: x + y ≤ 12 ✓ — karena <b>kapasitas</b> adalah batas atas.</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 11 : M2 QUIZ ================= -->
+<section class="slide" data-group="Materi 2" data-title="M2: Latihan 10 Soal">
+  <div class="wrap" style="width:min(920px,96vw)">
+    <span class="kicker">✏️ Latihan Materi 2</span>
+    <h1 class="slide-title">Latihan: <span class="grad">Variabel, Kendala &amp; Fungsi Tujuan</span></h1>
+    <p class="slide-sub">Bentuk model matematika dari berbagai masalah. Periksa jawabanmu dan pelajari pembahasannya! 🧠</p>
+    <div class="quiz-mount" data-quiz="m2"></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 12 : M3a KONSEP TITIK POJOK ================= -->
+<section class="slide" data-group="Materi 3" data-title="M3: Mengenal Titik Pojok">
+  <div class="wrap">
+    <span class="kicker">📘 Materi 3 — Titik Pojok</span>
+    <h1 class="slide-title">Mengenal <span class="grad">Titik Pojok</span> 📍</h1>
+    <div class="grid2">
+      <div>
+        <div class="card anim">
+          <div class="fbox" style="text-align:center;margin-bottom:12px">Titik pojok = <b>titik potong</b> antara garis-garis batas yang membentuk "sudut-sudut" daerah penyelesaian.</div>
+          <div class="math">Mengapa penting? Karena berlaku <b>Teorema Titik Pojok</b>:<br>
+          nilai maksimum/minimum fungsi tujuan pada daerah penyelesaian <b>selalu terletak di titik pojok</b>. Jadi kita tak perlu memeriksa ribuan titik — cukup 3–5 titik pojok saja! 🎉</div>
+        </div>
+        <div class="card anim d1" style="margin-top:14px">
+          <div class="iw-title">🧮 Cara Mencari Titik Potong Dua Garis</div>
+          <div style="display:grid;gap:9px;font-size:.9rem">
+            <div class="checkline" style="cursor:default">① <b>Eliminasi</b> — samakan koefisien satu variabel, kurangkan kedua persamaan.</div>
+            <div class="checkline" style="cursor:default">② <b>Substitusi</b> — masukkan hasilnya ke salah satu persamaan untuk variabel kedua.</div>
+            <div class="checkline" style="cursor:default">③ <b>Sumbu koordinat</b> — garis memotong sumbu-x di (c/a, 0) dan sumbu-y di (0, c/b). Jangan lupa O(0,0) juga sering jadi titik pojok!</div>
+          </div>
+        </div>
+      </div>
+      <div class="iw anim d1">
+        <div class="iw-title">🗺️ Contoh: daerah x + y ≤ 6, x ≥ 0, y ≥ 0</div>
+        <svg viewBox="0 0 460 340" class="graph-svg" id="m3aSvg"></svg>
+        <div class="gctrl">
+          <span class="chip g">Titik pojok: O(0,0)</span><span class="chip g">A(6,0)</span><span class="chip g">B(0,6)</span>
+        </div>
+        <p class="small muted" style="margin-top:8px">Daerah penyelesaiannya berbentuk <b>segitiga</b> — ada <b>3 titik pojok</b>. Makin banyak kendala, makin banyak sudutnya!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 13 : M3b LABORATORIUM ================= -->
+<section class="slide" data-group="Materi 3" data-title="M3: Laboratorium Titik Potong">
+  <div class="wrap">
+    <span class="kicker">🔬 Laboratorium Interaktif</span>
+    <h1 class="slide-title">Laboratorium <span class="grad">Titik Potong Dua Garis</span></h1>
+    <p class="slide-sub">Pilih dua garis, lalu klik <b>Cari Titik Potong</b> — mesin eliminasi-substitusi akan menghitungnya dan menandainya di grafik. Coba pasangan yang sejajar juga, apa yang terjadi? 👀</p>
+    <div class="grid2">
+      <div class="iw anim">
+        <div class="iw-title">🎛️ Panel Eksperimen</div>
+        <div style="display:grid;gap:11px">
+          <label style="font-size:.88rem;font-weight:600">Garis 1:
+            <select id="m3L1" style="width:100%;margin-top:5px;padding:10px 12px;border:2px solid #e2e8f0;border-radius:12px;font-family:inherit;font-weight:600">
+              <option value="1,1,6">x + y = 6</option>
+              <option value="2,1,8">2x + y = 8</option>
+              <option value="1,-1,2">x − y = 2</option>
+              <option value="1,2,10">x + 2y = 10</option>
+              <option value="0,1,3">y = 3</option>
+              <option value="1,0,4">x = 4</option>
+            </select></label>
+          <label style="font-size:.88rem;font-weight:600">Garis 2:
+            <select id="m3L2" style="width:100%;margin-top:5px;padding:10px 12px;border:2px solid #e2e8f0;border-radius:12px;font-family:inherit;font-weight:600">
+              <option value="2,1,8">2x + y = 8</option>
+              <option value="1,1,6">x + y = 6</option>
+              <option value="1,-1,2">x − y = 2</option>
+              <option value="1,2,10">x + 2y = 10</option>
+              <option value="0,1,3">y = 3</option>
+              <option value="1,0,4">x = 4</option>
+            </select></label>
+          <button class="btn btn-primary" id="m3Go">🔎 Cari Titik Potong</button>
+        </div>
+        <div id="m3Out" class="math" style="margin-top:13px;display:none"></div>
+      </div>
+      <div class="iw anim d1">
+        <div class="iw-title">📊 Visualisasi</div>
+        <svg viewBox="0 0 460 340" class="graph-svg" id="m3bSvg"></svg>
+        <p class="small muted" style="margin-top:8px">⭐ titik potong (jika ada). Garis <span style="color:#4f46e5;font-weight:700">biru</span> = Garis 1, garis <span style="color:#ec4899;font-weight:700">pink</span> = Garis 2.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 14 : M3 QUIZ ================= -->
+<section class="slide" data-group="Materi 3" data-title="M3: Latihan 10 Soal">
+  <div class="wrap" style="width:min(920px,96vw)">
+    <span class="kicker">✏️ Latihan Materi 3</span>
+    <h1 class="slide-title">Latihan: <span class="grad">Menentukan Titik Pojok</span></h1>
+    <p class="slide-sub">Soal isian boleh dijawab dengan koma/kurung, contoh: <b>4, 2</b> atau <b>(4,2)</b>. Sistem akan membacanya! 🤖</p>
+    <div class="quiz-mount" data-quiz="m3"></div>
+  </div>
+</section>
+<!-- ================= SLIDE 15 : M4a MENGGAMBAR GARIS ================= -->
+<section class="slide" data-group="Materi 4" data-title="M4: Menggambar Garis Batas">
+  <div class="wrap">
+    <span class="kicker">📘 Materi 4 — Membentuk Grafik</span>
+    <h1 class="slide-title">Langkah 1: <span class="grad">Menggambar Garis Batas</span></h1>
+    <div class="grid2">
+      <div>
+        <div class="card anim">
+          <div class="iw-title">🪜 Tiga Langkah Menggambar ax + by = c</div>
+          <div style="display:grid;gap:10px;font-size:.9rem">
+            <div class="checkline" style="cursor:default"><b>①</b> Cari titik potong sumbu-x: <b>y = 0</b> → x = c/a, titiknya <b>(c/a, 0)</b></div>
+            <div class="checkline" style="cursor:default"><b>②</b> Cari titik potong sumbu-y: <b>x = 0</b> → y = c/b, titiknya <b>(0, c/b)</b></div>
+            <div class="checkline" style="cursor:default"><b>③</b> Hubungkan kedua titik dengan penggaris. Garis <b>penuh</b> untuk ≤ ≥, <b>putus-putus</b> untuk &lt; &gt;.</div>
+          </div>
+        </div>
+        <div class="iw anim d1" style="margin-top:14px">
+          <div class="iw-title">✏️ Contoh: menggambar 2x + 3y = 12</div>
+          <div class="math">x = 0 → 3y = 12 → y = 4 → titik <b>(0, 4)</b><br>y = 0 → 2x = 12 → x = 6 → titik <b>(6, 0)</b></div>
+          <p class="small muted" style="margin-top:8px">Kedua titik itu "tembok pengarah" — cukup dua titik untuk satu garis lurus!</p>
+        </div>
+        <div class="card anim d2" style="margin-top:14px;background:#fffbeb;border:1.5px solid #fde68a">
+          <p style="font-size:.9rem;line-height:1.7">💡 <b>Garis vertikal &amp; horizontal:</b> kendala <b>x = 4</b> adalah garis vertikal (tegak), kendala <b>y = 3</b> garis horizontal (mendatar). Keduanya tidak menyentuh kedua sumbu sekaligus!</p>
+        </div>
+      </div>
+      <div class="iw anim d1">
+        <div class="iw-title">👀 Visual: Garis 2x + 3y = 12</div>
+        <svg viewBox="0 0 460 340" class="graph-svg" id="m4aSvg"></svg>
+        <p class="small muted" style="margin-top:8px">Perhatikan titik <b>(6,0)</b> dan <b>(0,4)</b> — itulah dua "jangkar" garisnya. Titik (0,0) uji: 2(0)+3(0)=0 ≤ 12 ✓ artinya daerah memuat (0,0).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 16 : M4b STUDIO GRAFIK BERSIH/KOTOR ================= -->
+<section class="slide" data-group="Materi 4" data-title="M4: Studio Grafik — Daerah Bersih vs Kotor">
+  <div class="wrap" style="width:min(1180px,97vw)">
+    <span class="kicker">🎨 Studio Interaktif Utama</span>
+    <h1 class="slide-title">Studio Grafik: <span class="grad">Daerah Bersih 🟢 vs Daerah Kotor 🔴</span></h1>
+    <p class="slide-sub">Dua teknik mengiris daerah penyelesaian: <b>Daerah Bersih</b> = langsung arsir daerah yang memenuhi semua kendala. <b>Daerah Kotor</b> = coret daerah yang <i>tidak</i> memenuhi tiap kendala satu per satu — sisanya (yang bersih) itulah daerah penyelesaian! Ikuti langkah 1→2→3.</p>
+    <div class="grid2" style="grid-template-columns:1.25fr .75fr">
+      <div class="iw anim">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+          <label style="font-size:.85rem;font-weight:700;color:#3730a3">Contoh sistem:</label>
+          <select id="m4Preset" style="flex:1;min-width:230px;padding:9px 12px;border:2px solid #e2e8f0;border-radius:12px;font-family:inherit;font-weight:600">
+            <option value="0">x + y ≤ 6, x ≥ 0, y ≥ 0</option>
+            <option value="1" selected>2x + y ≤ 8 dan x + y ≤ 6</option>
+            <option value="2">3x + 2y ≤ 12 dan x + y ≤ 5</option>
+            <option value="3">x + 2y ≥ 8 dan x + y ≤ 6 (uji (0,0) gagal!)</option>
+          </select>
+        </div>
+        <svg viewBox="0 0 640 470" class="graph-svg" id="m4Svg"></svg>
+        <div class="gctrl" style="margin-top:12px">
+          <button class="btn btn-ghost" id="m4Reset">↺ Ulangi</button>
+          <button class="btn btn-primary" id="m4S1" disabled>1️⃣ Gambar Garis</button>
+          <button class="btn btn-primary" id="m4S2" disabled>2️⃣ Uji Titik (0,0)</button>
+          <button class="btn btn-success" id="m4S3" disabled>3️⃣ Arsir Daerah</button>
+        </div>
+      </div>
+      <div>
+        <div class="iw anim d1">
+          <div class="iw-title">🎚️ Pilih Teknik Arsiran</div>
+          <div style="display:grid;gap:9px">
+            <label class="checkline" style="border:2px solid #a7f3d0"><input type="radio" name="m4mode" value="bersih" checked>
+              <span><b>🟢 Daerah Bersih</b> — arsir langsung daerah yang memenuhi <i>semua</i> kendala (irisan).</span></label>
+            <label class="checkline" style="border:2px solid #fecaca"><input type="radio" name="m4mode" value="kotor">
+              <span><b>🔴 Daerah Kotor</b> — coret bergantian daerah yang ditolak tiap kendala; yang tak tercoret = penyelesaian.</span></label>
+          </div>
+        </div>
+        <div class="iw anim d2" style="margin-top:12px">
+          <div class="iw-title">📝 Laporan Langkah</div>
+          <div id="m4Log" style="font-size:.86rem;line-height:1.75;min-height:120px;color:#334155">
+            👋 Klik <b>1️⃣ Gambar Garis</b> untuk memulai. Sistem akan menuntunmu langkah demi langkah.
+          </div>
+        </div>
+        <div class="card anim d3" style="margin-top:12px;background:linear-gradient(135deg,#eef2ff,#fdf2f8);padding:16px 18px">
+          <p class="small" style="line-height:1.7">💡 <b>Kapan pakai yang mana?</b> Keduanya sah! <b>Bersih</b> cepat jika kendalanya sedikit; <b>Kotor</b> aman dari salah arah jika kendalanya banyak atau ada tanda ≥, karena kita hanya perlu menolak sisi yang salah satu per satu.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 17 : M4 QUIZ ================= -->
+<section class="slide" data-group="Materi 4" data-title="M4: Latihan 10 Soal">
+  <div class="wrap" style="width:min(920px,96vw)">
+    <span class="kicker">✏️ Latihan Materi 4</span>
+    <h1 class="slide-title">Latihan: <span class="grad">Grafik Daerah Penyelesaian</span></h1>
+    <p class="slide-sub">Kerjakan sambil membayangkan studio grafik tadi. Untuk soal isian koordinat, tulis seperti: <b>4, 0</b> 😉</p>
+    <div class="quiz-mount" data-quiz="m4"></div>
+  </div>
+</section>
+<!-- ================= SLIDE 18 : M5a METODE TITIK POJOK ================= -->
+<section class="slide" data-group="Materi 5" data-title="M5: Metode Titik Pojok">
+  <div class="wrap">
+    <span class="kicker">📘 Materi 5 — Nilai Optimum</span>
+    <h1 class="slide-title">Menentukan Nilai Maksimum: <span class="grad">Metode Titik Pojok</span> 🏆</h1>
+    <div class="grid2">
+      <div>
+        <div class="card anim">
+          <div class="iw-title">🪜 Resep 3 Langkah</div>
+          <div style="display:grid;gap:10px;font-size:.92rem">
+            <div class="checkline" style="cursor:default">① <b>Gambar daerah penyelesaian</b> dari semua fungsi kendala.</div>
+            <div class="checkline" style="cursor:default">② <b>Temukan semua titik pojok</b> (termasuk O(0,0) bila termasuk daerah).</div>
+            <div class="checkline" style="cursor:default">③ <b>Substitusikan setiap titik pojok</b> ke fungsi tujuan f(x, y) = ax + by → nilai <b>terbesar</b> = maksimum, <b>terkecil</b> = minimum.</div>
+          </div>
+        </div>
+        <div class="iw anim d1" style="margin-top:14px">
+          <div class="iw-title">🧾 Contoh Lengkap</div>
+          <p style="font-size:.88rem;line-height:1.7">Kendala: <b>x + y ≤ 6</b>, <b>2x + y ≤ 8</b>, x ≥ 0, y ≥ 0. Titik pojoknya: <b>O(0,0)</b>, <b>A(4,0)</b>, <b>B(2,4)</b>, <b>C(0,6)</b>. Evaluasi f(x, y) = 5x + 4y:</p>
+          <table class="nice" style="margin-top:9px">
+            <tr><th>Titik Pojok</th><th>Substitusi 5x + 4y</th><th>Nilai f</th></tr>
+            <tr><td>O(0, 0)</td><td>5(0) + 4(0)</td><td>0</td></tr>
+            <tr><td>A(4, 0)</td><td>5(4) + 4(0)</td><td>20</td></tr>
+            <tr class="hl"><td>B(2, 4)</td><td>5(2) + 4(4)</td><td>26 ⭐ maks</td></tr>
+            <tr><td>C(0, 6)</td><td>5(0) + 4(6)</td><td>24</td></tr>
+          </table>
+          <div class="fbox" style="margin-top:10px;text-align:center;font-size:1rem">Nilai maksimum = <b>26</b>, dicapai di titik <b>B(2, 4)</b></div>
+        </div>
+      </div>
+      <div>
+        <div class="card anim d1" style="background:#fffbeb;border:1.5px solid #fde68a">
+          <div class="iw-title">⚠️ Hal yang Sering Terlewat</div>
+          <div style="display:grid;gap:9px;font-size:.88rem">
+            <div class="checkline" style="cursor:default">🔸 Jangan lupa titik <b>O(0,0)</b> — dia juga titik pojok jika daerahnya menyentuh titik asal!</div>
+            <div class="checkline" style="cursor:default">🔸 Untuk soal <b>minimum</b>, cari nilai <b>terkecil</b> dari tabel, bukan terbesar.</div>
+            <div class="checkline" style="cursor:default">🔸 Jika <b>dua titik pojok memberi nilai sama</b>, maka <i>semua</i> titik pada ruas garis di antara keduanya juga solusi optimum (banyak solusi).</div>
+            <div class="checkline" style="cursor:default">🔸 Jawaban akhir harus <b>ditafsirkan</b>: "produk maksimum 26" artinya apa dalam cerita?</div>
+          </div>
+        </div>
+        <div class="card anim d2" style="margin-top:14px">
+          <div class="iw-title">🧠 Kenapa Cukup Titik Pojok?</div>
+          <p style="font-size:.9rem;line-height:1.75">Bayangkan garis f = 5x + 4y = k "meluncur" ke kanan-atas — makin besar k. Saat meluncur pada daerah penyelesaian, <b>sentuhan terakhir sebelum garis lepas</b> selalu terjadi di sebuah sudut daerah (titik pojok). Itulah intuisi di balik Teorema Titik Pojok. 🛝</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 19 : M5b SIMULASI ================= -->
+<section class="slide" data-group="Materi 5" data-title="M5: Simulasi Pencari Nilai Maksimum">
+  <div class="wrap">
+    <span class="kicker">🕹️ Simulasi Interaktif</span>
+    <h1 class="slide-title">Klik Titik Pojoknya, <span class="grad">Racik Nilai Optimummu!</span></h1>
+    <p class="slide-sub">Daerah penyelesaian dari kendala <b>x + y ≤ 6</b>, <b>2x + y ≤ 8</b>, x ≥ 0, y ≥ 0 sudah tergambar. Atur koefisien f(x,y) = ax + by, lalu <b>klik setiap titik pojok</b> di grafik untuk mengumpulkan nilai!</p>
+    <div class="grid2" style="grid-template-columns:1.2fr .8fr">
+      <div class="iw anim">
+        <svg viewBox="0 0 560 470" class="graph-svg" id="m5Svg" style="cursor:pointer"></svg>
+        <p class="small muted center" style="margin-top:8px">👆 titik pojok bisa diklik (lingkaran ungu)</p>
+      </div>
+      <div class="anim d1">
+        <div class="iw">
+          <div class="iw-title">🎛️ Atur Fungsi Tujuan</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:1.05rem;font-weight:700;color:#3730a3">
+            f(x,y) =
+            <input type="number" id="m5a" value="5" min="-20" max="20" style="width:76px;padding:9px;border:2px solid #e2e8f0;border-radius:11px;font-family:inherit;font-weight:700;text-align:center">
+            x +
+            <input type="number" id="m5b" value="4" min="-20" max="20" style="width:76px;padding:9px;border:2px solid #e2e8f0;border-radius:11px;font-family:inherit;font-weight:700;text-align:center">
+            y
+          </div>
+          <div class="gctrl"><button class="btn btn-ghost" id="m5All">⚡ Evaluasi Semua Titik</button><button class="btn btn-ghost" id="m5Clr">🧹 Bersihkan</button></div>
+        </div>
+        <div class="iw" style="margin-top:12px">
+          <div class="iw-title">📋 Tabel Hasil Klik</div>
+          <table class="nice" id="m5Table"><tr><th>Titik</th><th>Perhitungan</th><th>f</th><th></th></tr>
+          <tr id="m5Empty"><td colspan="4" class="muted">Belum ada titik yang diklik… mulai dari O(0,0)! 🙂</td></tr></table>
+          <div id="m5Msg" class="fbox center" style="display:none;margin-top:11px;font-size:.98rem"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 20 : M5 QUIZ ================= -->
+<section class="slide" data-group="Materi 5" data-title="M5: Latihan 10 Soal">
+  <div class="wrap" style="width:min(920px,96vw)">
+    <span class="kicker">✏️ Latihan Materi 5</span>
+    <h1 class="slide-title">Latihan: <span class="grad">Nilai Maksimum &amp; Minimum</span></h1>
+    <p class="slide-sub">Siapkan kertas coretan — banyak soal butuh perhitungan substitusi. Semangat! 🔥</p>
+    <div class="quiz-mount" data-quiz="m5"></div>
+  </div>
+</section>
+<!-- ================= SLIDE 21 : M6a MEMBACA GRAFIK ================= -->
+<section class="slide" data-group="Materi 6" data-title="M6: Membaca Grafik">
+  <div class="wrap">
+    <span class="kicker">📘 Materi 6 — Keterampilan Terbalik</span>
+    <h1 class="slide-title">Dari Grafik → <span class="grad">Pertidaksamaan</span> 🔍</h1>
+    <p class="slide-sub">Sekarang kebalikannya: grafiknya yang ada, pertidaksamaannya yang dicari. Keterampilan ini sering keluar di ulangan &amp; berguna untuk membaca model yang sudah jadi!</p>
+    <div class="grid2">
+      <div class="card anim">
+        <div class="iw-title">🪜 4 Langkah Detektif</div>
+        <div style="display:grid;gap:10px;font-size:.92rem">
+          <div class="checkline" style="cursor:default">① <b>Baca titik potong garis batas</b> dengan kedua sumbu dari grafik.</div>
+          <div class="checkline" style="cursor:default">② <b>Bentuk persamaan garisnya</b> — bila memotong (a, 0) dan (0, b), pakai bentuk: <b>x/a + y/b = 1</b>, lalu rapikan.</div>
+          <div class="checkline" style="cursor:default">③ <b>Uji satu titik di daerah arsiran</b> (misal (0,0) bila terlihat jelas) untuk menentukan tanda ≤ atau ≥.</div>
+          <div class="checkline" style="cursor:default">④ <b>Cek garisnya</b>: penuh → ≤ atau ≥; putus-putus → &lt; atau &gt;. Lalu tulis jawaban!</div>
+        </div>
+      </div>
+      <div>
+        <div class="iw anim d1">
+          <div class="iw-title">✏️ Contoh Terpecahkan</div>
+          <p style="font-size:.9rem;line-height:1.75">Garis melalui <b>(4, 0)</b> dan <b>(0, 2)</b>; arsiran berada di bawah garis (memuat (0,0)).</p>
+          <div class="math">② x/4 + y/2 = 1 → <b>x + 2y = 4</b><br>
+          ③ uji (0,0): 0 + 0 = 0 ≤ 4 ✓ (sesuai arsiran)<br>
+          ④ garis penuh → tandanya ≤<br>
+          <b style="font-size:1.08em">✔ Jawaban: x + 2y ≤ 4</b></div>
+        </div>
+        <div class="card anim d2" style="margin-top:13px;background:#fffbeb;border:1.5px solid #fde68a">
+          <p style="font-size:.9rem;line-height:1.7">🚨 <b>Jebakan favorit guru:</b> arsiran <i>tidak</i> memuat (0,0) tetapi kamu asal memilih ≤. Selalu uji titik! Jika uji (0,0) menghasilkan PERNYATAAN SALAH, berarti daerahnya <b>seberang</b> (0,0) → tandanya ≥.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 22 : M6b DETEKTIF GRAFIK ================= -->
+<section class="slide" data-group="Materi 6" data-title="M6: Detektif Grafik">
+  <div class="wrap">
+    <span class="kicker">🕵️ Tantangan Interaktif</span>
+    <h1 class="slide-title">Detektif Grafik: <span class="grad">Tebak Dulu, Buka Jawabannya!</span></h1>
+    <p class="slide-sub">Amati tiap grafik, tulis tebakanmu di kertas, lalu klik <b>Lihat Pembahasan</b> untuk mengecek. Jujur ya! 😄</p>
+    <div class="grid3">
+      <div class="excard anim">
+        <div class="exh">Kasus 1 — arsiran memuat (0,0)</div>
+        <svg viewBox="0 0 300 230" class="graph-svg" id="m6Svg1" style="border-radius:0"></svg>
+        <div style="padding:11px 14px 15px">
+          <button class="btn btn-ghost" style="width:100%" onclick="m6Toggle('m6Exp1',this)">🔓 Lihat Pembahasan</button>
+          <div id="m6Exp1" class="qexp" style="margin-top:11px">
+            <div class="qh">💡 Pembahasan</div>
+            Garis melalui (2,0) &amp; (0,2) → x + y = 2. Uji (0,0): 0 ≤ 2 ✓ (memuat origin). Garis penuh. <b>Jawaban: x + y ≤ 2</b>
+          </div>
+        </div>
+      </div>
+      <div class="excard anim d1">
+        <div class="exh">Kasus 2 — arsiran TIDAK memuat (0,0)</div>
+        <svg viewBox="0 0 300 230" class="graph-svg" id="m6Svg2" style="border-radius:0"></svg>
+        <div style="padding:11px 14px 15px">
+          <button class="btn btn-ghost" style="width:100%" onclick="m6Toggle('m6Exp2',this)">🔓 Lihat Pembahasan</button>
+          <div id="m6Exp2" class="qexp" style="margin-top:11px">
+            <div class="qh">💡 Pembahasan</div>
+            Garis melalui (6,0) &amp; (0,4) → x/6 + y/4 = 1 → 2x + 3y = 12. Uji (0,0): 0 ≥ 12 ✗ → arsiran di seberang origin. <b>Jawaban: 2x + 3y ≥ 12</b>
+          </div>
+        </div>
+      </div>
+      <div class="excard anim d2">
+        <div class="exh">Kasus 3 — garis horizontal</div>
+        <svg viewBox="0 0 300 230" class="graph-svg" id="m6Svg3" style="border-radius:0"></svg>
+        <div style="padding:11px 14px 15px">
+          <button class="btn btn-ghost" style="width:100%" onclick="m6Toggle('m6Exp3',this)">🔓 Lihat Pembahasan</button>
+          <div id="m6Exp3" class="qexp" style="margin-top:11px">
+            <div class="qh">💡 Pembahasan</div>
+            Garis mendatar di y = 3; arsiran di bawahnya. Uji (0,0): 0 ≤ 3 ✓. <b>Jawaban: y ≤ 3</b>. Garis vertikal pun serupa: arsiran kanan garis x = 2 → <b>x ≥ 2</b>.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fbox mt anim d3 center">🎯 Rumus bentuk potong-sumbu: garis melalui (a, 0) dan (0, b) selalu punya persamaan <b>x/a + y/b = 1</b> — hafalkan, ini jalan pintas emas!</div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 23 : M6 QUIZ ================= -->
+<section class="slide" data-group="Materi 6" data-title="M6: Latihan 10 Soal">
+  <div class="wrap" style="width:min(920px,96vw)">
+    <span class="kicker">✏️ Latihan Materi 6</span>
+    <h1 class="slide-title">Latihan: <span class="grad">Pertidaksamaan dari Grafik</span></h1>
+    <p class="slide-sub">Bayangkan grafiknya di kepalamu — atau gambar cepat di kertas. Detektif grafik, beraksi! 🕵️‍♀️</p>
+    <div class="quiz-mount" data-quiz="m6"></div>
+  </div>
+</section>
+<!-- ================= SLIDE 24 : M7a DARI CERITA KE MODEL ================= -->
+<section class="slide" data-group="Materi 7" data-title="M7: Soal Cerita — Tahap 1 (Model)">
+  <div class="wrap">
+    <span class="kicker">📘 Materi 7 — Soal Cerita Komplet</span>
+    <h1 class="slide-title">Dari Soal Cerita Sampai Tuntas: <span class="grad">Tahap Membentuk Model</span></h1>
+    <div class="card anim" style="background:linear-gradient(135deg,#eff6ff,#fdf2f8);border:1.5px solid #bfdbfe">
+      <b style="color:#1e40af">🧾 Soal Utama:</b> Toko Roti "Manis Lezat" membuat roti cokelat dan roti keju. Setiap roti cokelat memerlukan 2 kg tepung dan dipanggang 1 jam; setiap roti keju memerlukan 1 kg tepung dan dipanggang 1 jam. Tepung yang tersedia 12 kg dan oven hanya bisa menyala 8 jam. Keuntungan tiap roti cokelat Rp8.000, tiap roti keju Rp6.000. <b>Berapa banyak tiap jenis roti yang harus dibuat agar keuntungan maksimum?</b>
+    </div>
+    <p class="slide-sub anim d1" style="margin-top:14px">Klik setiap langkah untuk membukanya. Coba kerjakan sendiri dulu di kertas <i>sebelum</i> membuka jawabannya! 🙈</p>
+    <div class="acc anim d1">
+      <button class="acc-h"><span class="stepnum">1</span> Pahami masalah &amp; buat tabel bahan <span class="chev">▾</span></button>
+      <div class="acc-b">
+        <table class="nice" style="max-width:640px;margin:auto">
+          <tr><th></th><th>Cokelat (x)</th><th>Keju (y)</th><th>Tersedia</th></tr>
+          <tr><td style="text-align:left"><b>Tepung (kg)</b></td><td>2</td><td>1</td><td>12</td></tr>
+          <tr><td style="text-align:left"><b>Oven (jam)</b></td><td>1</td><td>1</td><td>8</td></tr>
+          <tr><td style="text-align:left"><b>Untung (Rp)</b></td><td>8.000</td><td>6.000</td><td>— maks</td></tr>
+        </table>
+        <p class="small muted" style="margin-top:9px">Tabel bahan membuat semua angka terlihat rapi — langkah ini menghemat banyak kesalahan!</p>
+      </div>
+    </div>
+    <div class="acc anim d2">
+      <button class="acc-h"><span class="stepnum">2</span> Tentukan variabel keputusan <span class="chev">▾</span></button>
+      <div class="acc-b">x = banyak roti <b>cokelat</b> yang dibuat, y = banyak roti <b>keju</b> yang dibuat.<br><span class="small muted">Keduanya tidak mungkin negatif → x ≥ 0 dan y ≥ 0.</span></div>
+    </div>
+    <div class="acc anim d3">
+      <button class="acc-h"><span class="stepnum">3</span> Bentuk fungsi kendala &amp; fungsi tujuan <span class="chev">▾</span></button>
+      <div class="acc-b">
+        <div class="math">Tepung: <b>2x + y ≤ 12</b> &nbsp;•&nbsp; Oven: <b>x + y ≤ 8</b> &nbsp;•&nbsp; Non-negatif: <b>x ≥ 0, y ≥ 0</b></div>
+        <div class="fbox" style="margin-top:10px;text-align:center">Fungsi tujuan (ribuan Rp): <b>f(x, y) = 8x + 6y</b> → maksimumkan!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 25 : M7b MENYELESAIKAN ================= -->
+<section class="slide" data-group="Materi 7" data-title="M7: Soal Cerita — Tahap 2 (Menyelesaikan)">
+  <div class="wrap">
+    <span class="kicker">📘 Materi 7 — Soal Cerita Komplet</span>
+    <h1 class="slide-title">Tahap Menyelesaikan: <span class="grad">Grafik → Titik Pojok → Kesimpulan</span></h1>
+    <div class="grid2">
+      <div>
+        <div class="acc anim">
+          <button class="acc-h"><span class="stepnum">4</span> Gambar grafik daerah penyelesaian <span class="chev">▾</span></button>
+          <div class="acc-b">
+            Garis <b>2x + y = 12</b> melalui (6, 0) dan (0, 12). Garis <b>x + y = 8</b> melalui (8, 0) dan (0, 8). Uji (0,0): 0 ≤ 12 ✓ dan 0 ≤ 8 ✓ → keduanya memuat (0,0). Irisan keduanya dengan kuadran I:
+            <svg viewBox="0 0 440 330" class="graph-svg" id="m7Svg" style="margin-top:9px"></svg>
+          </div>
+        </div>
+        <div class="acc anim d1">
+          <button class="acc-h"><span class="stepnum">5</span> Cari semua titik pojok <span class="chev">▾</span></button>
+          <div class="acc-b">
+            • <b>O(0, 0)</b> — titik asal<br>
+            • <b>A(6, 0)</b> — potong garis tepung dengan sumbu-x (y=0 → 2x=12)<br>
+            • <b>B(4, 4)</b> — eliminasi: (2x + y = 12) − (x + y = 8) → x = 4, lalu y = 8 − 4 = 4<br>
+            • <b>C(0, 8)</b> — potong garis oven dengan sumbu-y<br>
+            <span class="small muted">Empat titik pojok, siap dievaluasi!</span>
+          </div>
+        </div>
+        <div class="acc anim d2">
+          <button class="acc-h"><span class="stepnum">6</span> Evaluasi &amp; simpulkan <span class="chev">▾</span></button>
+          <div class="acc-b">
+            <table class="nice" style="max-width:560px;margin:auto">
+              <tr><th>Titik</th><th>f = 8x + 6y</th><th>Nilai</th></tr>
+              <tr><td>O(0,0)</td><td>8(0)+6(0)</td><td>0</td></tr>
+              <tr><td>A(6,0)</td><td>8(6)+6(0)</td><td>48</td></tr>
+              <tr class="hl"><td>B(4,4)</td><td>8(4)+6(4)</td><td>56 ⭐</td></tr>
+              <tr><td>C(0,8)</td><td>8(0)+6(8)</td><td>48</td></tr>
+            </table>
+            <div class="fbox" style="margin-top:11px;text-align:center">🏆 Buat <b>4 roti cokelat + 4 roti keju</b> → keuntungan maksimum <b>Rp56.000</b></div>
+            <p class="small muted" style="margin-top:9px">Terakhir, <b>tafsirkan</b>: angka 4 dan 4 bermakna "banyak roti", 56 ribu bermakna "keuntungan" — jawaban matematika kembali ke dunia nyata. ✅</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card anim d1">
+          <div class="iw-title">🗺️ Peta 6 Langkah Emas</div>
+          <div style="display:grid;gap:8px;font-size:.88rem">
+            <div class="checkline" style="cursor:default">1️⃣ Pahami masalah + tabel bahan</div>
+            <div class="checkline" style="cursor:default">2️⃣ Variabel keputusan x, y</div>
+            <div class="checkline" style="cursor:default">3️⃣ Fungsi kendala &amp; fungsi tujuan</div>
+            <div class="checkline" style="cursor:default">4️⃣ Grafik daerah penyelesaian</div>
+            <div class="checkline" style="cursor:default">5️⃣ Titik-titik pojok</div>
+            <div class="checkline" style="cursor:default">6️⃣ Evaluasi → maksimum/minimum → tafsirkan jawaban</div>
+          </div>
+        </div>
+        <div class="card anim d2" style="margin-top:13px;background:#fffbeb;border:1.5px solid #fde68a">
+          <div class="iw-title">🚨 Cek Kewajaran Jawaban</div>
+          <p style="font-size:.88rem;line-height:1.7">B(4,4) harus <b>memenuhi semua kendala</b>: tepung 2(4)+4 = 12 ≤ 12 ✓, oven 4+4 = 8 ≤ 8 ✓. Solusi yang melanggar kendala = otomatis salah, apa pun nilainya!</p>
+        </div>
+        <div class="card anim d3" style="margin-top:13px;background:linear-gradient(135deg,#ecfdf5,#eef2ff)">
+          <p style="font-size:.9rem;line-height:1.75">🌱 <b>Level berikutnya:</b> kalau kendalanya bertambah (mis. permintaan minimal 2 roti keju: y ≥ 2), daerahnya menyempit dan titik pojoknya berubah — tapi 6 langkahnya TETAP SAMA. Kuasai polanya, kamu bisa menyelesaikan soal program linear apa pun! 💪</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 26 : M7 QUIZ ================= -->
+<section class="slide" data-group="Materi 7" data-title="M7: Latihan 10 Soal">
+  <div class="wrap" style="width:min(920px,96vw)">
+    <span class="kicker">✏️ Latihan Materi 7 — Bos Level!</span>
+    <h1 class="slide-title">Latihan: <span class="grad">Soal Cerita Menyeluruh</span></h1>
+    <p class="slide-sub">10 soal merangkum semuanya: model, grafik, titik pojok, sampai kesimpulan. Ini level bos — selamat bertarung! ⚔️</p>
+    <div class="quiz-mount" data-quiz="m7"></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 27 : EXIT TICKET ================= -->
+<section class="slide" data-group="Penutup" data-title="Exit Ticket — 4 Soal">
+  <div class="wrap" style="width:min(880px,96vw)">
+    <span class="kicker">🎫 Sebelum Pulang</span>
+    <h1 class="slide-title">Exit Ticket: <span class="grad">Tiket Keluar Kelas</span></h1>
+    <p class="slide-sub">4 soal penyaring terakhir untuk memastikan kamu benar-benar siap. Selesaikan tanpa berbantuan! Ini "tiket"-mu untuk meninggalkan kelas hari ini. 🎫</p>
+    <div class="quiz-mount" data-quiz="exit"></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 28 : KESIMPULAN ================= -->
+<section class="slide" data-group="Penutup" data-title="Kesimpulan">
+  <div class="wrap">
+    <span class="kicker">🎀 Rangkuman</span>
+    <h1 class="slide-title">Kesimpulan: <span class="grad">Yang Wajib Dibawa Pulang</span></h1>
+    <div class="grid2">
+      <div>
+        <div class="card anim"><b>1. Program Linear = seni keputusan terbaik 🎯</b><p class="small muted" style="margin-top:6px">Teknik mencari nilai maksimum/minimum fungsi tujuan yang dibatasi pertidaksamaan linear. Dipakai di pabrik, diet, logistik, hingga uang jajanmu.</p></div>
+        <div class="card anim d1" style="margin-top:12px"><b>2. Model matematika punya 3 komponen 🧩</b><p class="small muted" style="margin-top:6px"><b>Variabel keputusan</b> (x, y) + <b>fungsi kendala</b> (sistem pertidaksamaan, ingat kendala non-negatif!) + <b>fungsi tujuan</b> f(x, y) = ax + by.</p></div>
+      </div>
+      <div>
+        <div class="card anim d1"><b>3. Grafik = irisan semua daerah 📊</b><p class="small muted" style="margin-top:6px">Gambar tiap garis batas (pakai titik potong sumbu), uji titik (0,0), lalu pilih teknik <b>daerah bersih</b> (arsir yang memenuhi) atau <b>daerah kotor</b> (coret yang tidak memenuhi).</p></div>
+        <div class="card anim d2" style="margin-top:12px"><b>4. Titik pojok = rumah nilai optimum 🏆</b><p class="small muted" style="margin-top:6px">Cari titik potong garis-garis batas, substitusikan ke f(x, y), ambil terbesar (maks) atau terkecil (min), lalu <b>tafsirkan</b> kembali ke konteks soal.</p></div>
+      </div>
+    </div>
+    <div class="iw anim d3" style="margin-top:18px">
+      <div class="iw-title">🧭 Alur Berpikir Lengkap (peta konsep)</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;font-weight:700;font-size:.9rem">
+        <span class="chip">Masalah Nyata</span><span style="color:#818cf8">→</span>
+        <span class="chip g">Model Matematika</span><span style="color:#818cf8">→</span>
+        <span class="chip p">Grafik Daerah</span><span style="color:#818cf8">→</span>
+        <span class="chip a">Titik Pojok</span><span style="color:#818cf8">→</span>
+        <span class="chip">Nilai Optimum</span><span style="color:#818cf8">→</span>
+        <span class="chip g">Tafsiran &amp; Keputusan</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 29 : REFLEKSI ================= -->
+<section class="slide" data-group="Penutup" data-title="Refleksi">
+  <div class="wrap">
+    <span class="kicker">🪞 Introspeksi Diri</span>
+    <h1 class="slide-title">Refleksi: <span class="grad">Bagaimana Perasaanmu Hari Ini?</span></h1>
+    <div class="grid2">
+      <div>
+        <div class="iw anim">
+          <div class="iw-title">1️⃣ Pilih mood-mu</div>
+          <div class="moodrow" id="moodRow">
+            <button class="mood" data-m="😀 Alhamdulillah, semua paham!" title="Sangat paham">😀</button>
+            <button class="mood" data-m="🙂 Cukup paham, sedikit ragu." title="Cukup paham">🙂</button>
+            <button class="mood" data-m="😐 Bingung di beberapa bagian." title="Biasa saja">😐</button>
+            <button class="mood" data-m="😟 Masih banyak yang belum paham." title="Kurang paham">😟</button>
+            <button class="mood" data-m="😵 Butuh belajar ulang dari awal." title="Belum paham">😵</button>
+          </div>
+          <div id="moodMsg" class="chip" style="margin-top:12px;display:none"></div>
+        </div>
+        <div class="iw anim d1" style="margin-top:13px">
+          <div class="iw-title">2️⃣ Centang yang bisa kamu lakukan</div>
+          <div id="tpCheck">
+            <label class="checkline"><input type="checkbox"> Saya bisa menjelaskan apa itu program linear + contohnya.</label>
+            <label class="checkline"><input type="checkbox"> Saya bisa membentuk fungsi kendala &amp; fungsi tujuan dari soal cerita.</label>
+            <label class="checkline"><input type="checkbox"> Saya bisa menggambar grafik (bersih/kotor) dengan benar.</label>
+            <label class="checkline"><input type="checkbox"> Saya bisa mencari titik pojok dengan eliminasi-substitusi.</label>
+            <label class="checkline"><input type="checkbox"> Saya bisa menentukan nilai maksimum/minimum &amp; menafsirkannya.</label>
+            <label class="checkline"><input type="checkbox"> Saya bisa menulis pertidaksamaan dari sebuah grafik.</label>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="iw anim d1">
+          <div class="iw-title">3️⃣ Tulis refleksimu</div>
+          <label class="small" style="font-weight:600">🌟 Materi yang paling menarik / paling kamu kuasai:</label>
+          <textarea class="rt" id="r1" placeholder="Contoh: menentukan nilai maksimum lewat tabel titik pojok…"></textarea>
+          <label class="small" style="font-weight:600;margin-top:10px;display:block">🤯 Bagian yang masih membingungkan:</label>
+          <textarea class="rt" id="r2" placeholder="Contoh: menentukan arah arsiran saat titik uji gagal…"></textarea>
+          <label class="small" style="font-weight:600;margin-top:10px;display:block">❓ Pertanyaan yang masih tersisa di kepalamu:</label>
+          <textarea class="rt" id="r3" placeholder="Contoh: bagaimana kalau kendalanya lebih dari dua garis?"></textarea>
+          <div class="gctrl">
+            <button class="btn btn-success" id="saveRef">💾 Simpan Refleksi (.txt)</button>
+          </div>
+          <div id="refMsg" class="chip g" style="display:none;margin-top:10px">✅ Refleksi tersimpan — terima kasih sudah jujur pada dirimu sendiri!</div>
+        </div>
+        <div class="card anim d2" style="margin-top:13px;background:linear-gradient(135deg,#fdf2f8,#eef2ff)">
+          <p style="font-size:.9rem;line-height:1.7">💛 Refleksi bukan penilaian, tapi <b>kompas belajarmu</b>. Bagian yang masih bingung = peta menuju penguatan berikutnya. Guru akan membaca hasil refleksi kelas untuk menyiapkan pertemuan lanjutan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 30 : PENUTUP ================= -->
+<section class="slide" data-group="Penutup" data-title="Terima Kasih!">
+  <div class="wrap center" style="display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative">
+    <div class="floaty" style="top:6%;left:12%">📐</div>
+    <div class="floaty" style="top:14%;right:14%;animation-delay:-2s">📊</div>
+    <div class="floaty" style="bottom:16%;left:18%;animation-delay:-4s">✏️</div>
+    <div class="floaty" style="bottom:22%;right:12%;animation-delay:-1s">⭐</div>
+    <div class="anim"><span class="kicker">🎉 Sesi Selesai</span></div>
+    <h1 class="thanks-title anim d1" style="margin:6px 0 10px">Terima Kasih<br>untuk Hari Ini!</h1>
+    <p class="anim d2" style="max-width:620px;font-size:1.05rem;color:#475569;line-height:1.8">Kamu baru saja menaklukkan <b>Program Linear</b>: dari uang jajan sampai keuntungan pabrik. Ingat — matematika bukan soal menghitung cepat, tapi <b>memutuskan dengan bijak</b>. Sampai jumpa di materi berikutnya! 🚀</p>
+    <div class="anim d3" style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-primary" id="confBtn" style="font-size:1.05rem">🎊 Rayakan dengan Konfeti!</button>
+      <button class="btn btn-ghost" id="backCover">🏠 Kembali ke Cover</button>
+    </div>
+    <p class="small anim d4" style="margin-top:26px;color:#64748b">Matematika Kelas X • Program Linear • Kurikulum Merdeka — dibuat dengan ❤️ untuk pembelajaran</p>
+  </div>
+</section>
+
+</main>
+
+<nav class="navbtns" aria-label="Navigasi slide">
+  <button class="navbtn" id="prevBtn" title="Slide sebelumnya (←)" aria-label="Slide sebelumnya">←</button>
+  <button class="navbtn" id="nextBtn" title="Slide berikutnya (→)" aria-label="Slide berikutnya">→</button>
+</nav>
+<div class="slide-hint">← → untuk pindah slide • ☰ daftar isi</div>
+<script>
+/* ================================================================
+   PROGRAM LINEAR INTERAKTIF — Kelas X Kurikulum Merdeka
+   ================================================================ */
+'use strict';
+
+/* ============ 1. MESIN SLIDE & DAFTAR ISI ============ */
+const slides = Array.from(document.querySelectorAll('.slide'));
+let cur = 0;
+
+function go(n){
+  n = Math.max(0, Math.min(slides.length - 1, n));
+  if(n === cur && slides[cur].classList.contains('active')){ closeToc(); return; }
+  slides[cur].classList.remove('active');
+  cur = n;
+  const s = slides[cur];
+  s.classList.add('active');
+  const w = s.querySelector('.wrap');
+  if(w) w.scrollTop = 0;
+  closeToc();
+  updateToc();
+  document.getElementById('prevBtn').disabled = (cur === 0);
+  document.getElementById('nextBtn').disabled = (cur === slides.length - 1);
+}
+
+function buildToc(){
+  const list = document.getElementById('tocList');
+  let group = '';
+  slides.forEach((s, i) => {
+    const g = s.dataset.group || 'Lainnya';
+    if(g !== group){
+      group = g;
+      const h = document.createElement('div');
+      h.className = 'toc-group'; h.textContent = g;
+      list.appendChild(h);
+    }
+    const b = document.createElement('button');
+    b.className = 'toc-item';
+    b.innerHTML = '<span class="num">' + (i+1) + '</span><span>' + (s.dataset.title || 'Slide') + '</span>';
+    b.addEventListener('click', () => go(i));
+    list.appendChild(b);
+  });
+}
+function updateToc(){
+  document.querySelectorAll('.toc-item').forEach((b, i) => b.classList.toggle('now', i === cur));
+}
+function openToc(){ document.getElementById('toc').classList.add('open'); document.getElementById('tocOverlay').classList.add('open'); }
+function closeToc(){ document.getElementById('toc').classList.remove('open'); document.getElementById('tocOverlay').classList.remove('open'); }
+
+document.getElementById('menuBtn').addEventListener('click', openToc);
+document.getElementById('tocClose').addEventListener('click', closeToc);
+document.getElementById('tocOverlay').addEventListener('click', closeToc);
+document.getElementById('prevBtn').addEventListener('click', () => go(cur - 1));
+document.getElementById('nextBtn').addEventListener('click', () => go(cur + 1));
+document.getElementById('startBtn').addEventListener('click', () => go(1));
+document.getElementById('backCover').addEventListener('click', () => go(0));
+
+document.addEventListener('keydown', (e) => {
+  const t = e.target;
+  if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+  if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  else if(e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
+  else if(e.key === 'm' || e.key === 'M') { document.getElementById('toc').classList.contains('open') ? closeToc() : openToc(); }
+});
+
+/* ============ 2. MESIN KUIS ============ */
+const QUIZ = {};
+QUIZ.review = {
+  title: '⚡ Pemanasan',
+  questions: [
+    { q: 'Manakah yang merupakan <b>pertidaksamaan linear dua variabel</b>?',
+      opts: ['3x<sup>2</sup> + 2y ≤ 12', '3x + 2y ≤ 12', '3x + 2 = 12', '3x + 2y + 12'],
+      ans: 1, exp: '<b>Linear</b> berarti setiap variabel berpangkat satu dan ada hubungan "lebih kecil/besar" (tanda &lt; &gt; ≤ ≥) dengan dua variabel. Pilihan A memuat x² (kuadrat), C hanya satu variabel dan berbentuk persamaan, D tidak memiliki tanda pertidaksamaan.' },
+    { q: 'Apakah titik <b>(1, 3)</b> memenuhi pertidaksamaan <b>2x + y ≤ 6</b>?',
+      opts: ['Memenuhi, karena 2(1) + 3 = 5 ≤ 6', 'Tidak memenuhi, karena 5 &gt; 4', 'Memenuhi, karena 6 ≤ 5', 'Tidak memenuhi, karena 2 + 3 = 5 ≠ 6'],
+      ans: 0, exp: 'Substitusikan x = 1 dan y = 3: 2(1) + 3 = 2 + 3 = 5. Karena 5 ≤ 6 (pernyataan benar), titik (1,3) <b>termasuk</b> daerah penyelesaian. ✅' },
+    { q: 'Garis <b>2x + 3y = 6</b> memotong <b>sumbu-x</b> di titik…',
+      opts: ['(0, 2)', '(3, 0)', '(2, 0)', '(0, 3)'],
+      ans: 1, exp: 'Di sumbu-x, y = 0. Maka 2x + 3(0) = 6 → 2x = 6 → x = 3. Titik potongnya <b>(3, 0)</b>. (Untuk sumbu-y, syaratnya x = 0 → y = 2, yaitu (0,2).)' },
+    { q: 'Titik uji (0, 0) disubstitusikan ke <b>x + y ≥ 4</b> menghasilkan 0 ≥ 4 yang <b>SALAH</b>. Artinya…',
+      opts: ['Daerah penyelesaian memuat (0, 0)', 'Daerah penyelesaian <b>tidak</b> memuat (0, 0)', 'Garisnya melalui (0, 0)', 'Pertidaksamaan tidak punya daerah'],
+      ans: 1, exp: 'Saat hasil uji <b>salah</b>, titik uji berada <b>di luar</b> daerah penyelesaian → daerah yang benar berada di <b>seberang</b> (0,0), yaitu sisi atas garis x + y = 4. 🎯' },
+    { q: 'Untuk tanda pertidaksamaan <b>≤</b> atau <b>≥</b>, garis batas digambar…',
+      opts: ['Putus-putus', 'Penuh', 'Bergelombang', 'Tidak perlu digambar'],
+      ans: 1, exp: 'Tanda ≤ / ≥ masih "membolehkan" titik pada garis (misal y ≤ 5 boleh y = 5), sehingga garisnya <b>penuh</b>. Garis putus-putus hanya untuk tanda ketat &lt; / &gt;.' }
+  ]
+};
+QUIZ.m1 = {
+  title: '📘 Materi 1',
+  questions: [
+    { q: '<b>Program linear</b> adalah metode matematika untuk…',
+      opts: ['mencari akar-akar persamaan kuadrat', 'mengoptimalkan (mencari nilai maksimum/minimum) fungsi tujuan yang dibatasi kendala linear', 'menghitung peluang suatu kejadian', 'menggambar grafik fungsi trigonometri'],
+      ans: 1, exp: 'Inti program linear adalah <b>optimasi</b>: memilih nilai x dan y terbaik agar f(x, y) maksimum atau minimum, dengan syarat berupa pertidaksamaan linear. 🎯' },
+    { q: 'Dalam istilah "program linear", kata <b>program</b> bermakna…',
+      opts: ['program komputer', 'susunan acara televisi', 'rencana/susunan keputusan yang optimal', 'kode sandi rahasia'],
+      ans: 2, exp: '"Program" di sini berarti <b>rencana terstruktur</b> untuk mengambil keputusan terbaik (bukan program komputer). Contohnya rencana produksi roti paling menguntungkan. 📋' },
+    { q: 'Diketahui fungsi tujuan <b>f(x, y) = 6x + 4y</b>. Nilai f di titik <b>(2, 3)</b> adalah…',
+      type: 'input', ans: 24, ph: 'mis. 24', exp: 'Substitusi: f(2, 3) = 6(2) + 4(3) = 12 + 12 = <b>24</b>. Inilah cara evaluasi fungsi tujuan yang nantinya dipakai di setiap titik pojok. 🧮' },
+    { q: 'Masalah berikut yang <b>paling cocok</b> diselesaikan dengan program linear adalah…',
+      opts: ['menentukan luas sebuah lingkaran', 'menentukan kombinasi produksi dua jenis kue dengan tepung terbatas agar keuntungan maksimum', 'mencari sisa pembagian 17 oleh 5', 'menghitung rata-rata nilai ulangan kelas'],
+      ans: 1, exp: 'Program linear cocok untuk masalah dengan <b>beberapa pilihan keputusan</b> (kombinasi dua produk), <b>kendala</b> (bahan terbatas), dan <b>tujuan</b> (untung maks). Ciri khasnya: kendala linear! 🏭' },
+    { q: 'Fungsi kendala dalam program linear dinyatakan dalam bentuk…',
+      opts: ['persamaan kuadrat', 'pertidaksamaan linear', 'fungsi trigonometri', 'barisan geometri'],
+      ans: 1, exp: 'Kendala = batasan masalah (bahan, waktu, uang) yang ditulis sebagai <b>pertidaksamaan linear</b>, misal 2x + y ≤ 12, ditambah kendala non-negatif x ≥ 0, y ≥ 0. 🚧' },
+    { q: 'Jika tujuan masalah adalah "biaya <b>minimum</b>", maka kita mencari nilai fungsi tujuan yang…',
+      opts: ['terbesar', 'terkecil', 'paling dekat dengan nol', 'selalu sama dengan nol'],
+      ans: 1, exp: 'Minimum = nilai <b>terkecil</b> f(x, y) di antara semua titik pada daerah penyelesaian. Contoh: menyusun menu diet dengan biaya termurah namun tetap bergizi. 🥗' },
+    { q: 'Matematikawan yang menciptakan <b>metode simpleks</b> (1947), batu loncatan program linear modern, adalah…',
+      opts: ['Isaac Newton', 'George Dantzig', 'Albert Einstein', 'Leonhard Euler'],
+      ans: 1, exp: '<b>George Dantzig</b> menciptakan metode simpleks pada 1947. Sebelumnya, <b>Leonid Kantorovich</b> (1939) telah memakai ide serupa untuk perencanaan pabrik dan meraih Nobel Ekonomi 1975. 🏅' },
+    { q: 'Sebuah kantin menjual takjil A (x) dengan untung Rp12.000 dan takjil B (y) dengan untung Rp15.000 per unit. Fungsi tujuannya f = 12x + 15y (ribuan rupiah). Nilai f di titik <b>(4, 2)</b> adalah…',
+      type: 'input', ans: 78, ph: 'mis. 50', exp: 'f(4, 2) = 12(4) + 15(2) = 48 + 30 = <b>78</b> → keuntungan Rp78.000 bila menjual 4 takjil A dan 2 takjil B. 💰' },
+    { q: 'Pernyataan yang <b>benar</b> tentang program linear adalah…',
+      opts: ['hanya bisa dipakai untuk masalah bisnis besar', 'hubungan variabelnya berpangkat satu dan berbentuk persamaan/pertidaksamaan linear', 'tidak memerlukan daerah penyelesaian', 'tidak dapat digunakan untuk masalah minimum'],
+      ans: 1, exp: 'Ciri program linear: semua hubungan <b>berpangkat satu</b> (linear). Penerapannya luas (bisnis, diet, olahraga, belajar), bisa untuk maksimum <b>maupun</b> minimum, dan selalu memakai daerah penyelesaian. ✔️' },
+    { q: 'Contoh penerapan program linear dalam kehidupan sehari-hari yang <b>paling tepat</b> adalah…',
+      opts: ['memilih warna seragam untuk acara', 'mengatur kombinasi menu makanan dengan biaya terbatas agar kebutuhan gizi tercukupi', 'menebak isi sebuah kado', 'menghafal puisi untuk lomba'],
+      ans: 1, exp: 'Menu makan punya <b>kendala</b> (biaya, kalori) dan <b>tujuan</b> (gizi maks/biaya min) — persis struktur program linear. Pilihan lain tidak memiliki variabel keputusan yang dioptimalkan. 🍱' }
+  ]
+};
+QUIZ.m2 = {
+  title: '📘 Materi 2',
+  questions: [
+    { q: '<b>Kasus toko roti:</b> x = banyak roti cokelat, y = banyak roti keju. Variabel x dan y ini disebut…',
+      opts: ['variabel acak', 'variabel keputusan', 'variabel bebas grafik', 'konstanta'],
+      ans: 1, exp: 'Variabel yang nilainya kita <b>putuskan</b> (berapa banyak tiap produk dibuat) disebut <b>variabel keputusan</b>. Seluruh kendala dan tujuan ditulis dalam x dan y ini. 🧩' },
+    { q: 'Roti cokelat memakai <b>2 kg tepung</b>, roti keju <b>1 kg tepung</b>, tepung tersedia <b>12 kg</b>. Fungsi kendala tepungnya adalah…',
+      opts: ['2x + y ≤ 12', 'x + 2y ≤ 12', '2x + y ≥ 12', '2x − y ≤ 12'],
+      ans: 0, exp: 'Cokelat menyumbang 2x dan keju menyumbang y kg tepung; total tidak boleh melebihi 12 → <b>2x + y ≤ 12</b>. Karena tepungnya 2 kg per cokelat, koefisien x adalah 2. 🌾' },
+    { q: 'Setiap roti (cokelat maupun keju) dipanggang <b>1 jam</b>, oven tersedia <b>8 jam</b>. Fungsi kendala ovennya adalah…',
+      opts: ['x + y ≤ 8', 'x + y ≥ 8', 'x − y ≤ 8', '2x + 2y ≤ 8'],
+      ans: 0, exp: 'Kedua jenis roti memakai oven 1 jam, jadi total waktu = x + y dan harus ≤ 8 → <b>x + y ≤ 8</b>. Koefisiennya sama (1 dan 1) karena waktunya sama. 🔥' },
+    { q: 'Kendala non-negatif dari masalah produksi roti dituliskan…',
+      opts: ['x ≤ 0 dan y ≤ 0', 'x ≥ 0 dan y ≥ 0', 'x dan y bebas', 'x = 0 dan y = 0'],
+      ans: 1, exp: 'Banyak roti tidak mungkin negatif! Karena itu setiap masalah program linear wajib punya <b>x ≥ 0, y ≥ 0</b> — kendala ini juga ikut membentuk daerah penyelesaian (kuadran I). 📐' },
+    { q: 'Untung roti cokelat <b>Rp8.000</b> dan roti keju <b>Rp6.000</b> per buah (dalam ribuan rupiah). Fungsi tujuan untuk keuntungan <b>maksimum</b> adalah…',
+      opts: ['f = 6x + 8y', 'f = 8x + 6y', 'f = 8x − 6y', 'f = 2x + y'],
+      ans: 1, exp: 'Koefisien x = keuntungan per roti cokelat = <b>8</b>; koefisien y = keuntungan per roti keju = <b>6</b>. Jadi f(x, y) = <b>8x + 6y</b> (ribuan Rp). Hati-hati jangan tertukar urutannya! 💡' },
+    { q: 'Pada fungsi tujuan f = 8x + 6y, angka <b>6</b> bermakna…',
+      opts: ['banyak tepung yang tersedia', 'keuntungan setiap satu roti keju (ribuan rupiah)', 'lama memanggang roti keju', 'banyak roti keju maksimum'],
+      ans: 1, exp: 'Koefisien variabel adalah <b>kontribusi per satuannya</b>. Setiap 1 roti keju menambah keuntungan 6 (ribuan Rp) → itulah makna angka 6. 🔍' },
+    { q: 'Dengan f = 8x + 6y (ribuan Rp), nilai f di titik <b>(3, 2)</b> adalah…',
+      type: 'input', ans: 36, ph: 'mis. 36', exp: 'f(3, 2) = 8(3) + 6(2) = 24 + 12 = <b>36</b> → artinya keuntungan Rp36.000 bila membuat 3 roti cokelat dan 2 roti keju. 🧮' },
+    { q: 'Kalimat "toko <b>sekurang-kurangnya</b> membuat 5 roti keju" diterjemahkan menjadi…',
+      opts: ['y ≤ 5', 'y ≥ 5', 'y &gt; 5', 'y = 5'],
+      ans: 1, exp: '"Sekurang-kurangnya 5" = paling sedikit 5 = <b>y ≥ 5</b>. Kata kunci ≥: <i>minimal, sekurang-kurangnya, paling sedikit, tidak kurang dari</i>. 📌' },
+    { q: 'Berikut ini yang <b>BUKAN</b> fungsi kendala dari kasus toko roti adalah…',
+      opts: ['2x + y ≤ 12', 'x + y ≤ 8', 'x ≥ 0', 'f(x, y) = 8x + 6y'],
+      ans: 3, exp: 'f(x, y) = 8x + 6y adalah <b>fungsi tujuan</b> (yang dioptimalkan), bukan kendala. Kendala adalah batasan: 2x + y ≤ 12, x + y ≤ 8, dan x ≥ 0, y ≥ 0. 🚫' },
+    { q: 'Frasa "mesin dipakai <b>paling banyak</b> 30 jam" diterjemahkan menjadi…',
+      opts: ['≥ 30', '≤ 30', '= 30', '&lt; 30'],
+      ans: 1, exp: '"Paling banyak" = batas atas → tanda <b>≤</b>. Pasangan kata kuncinya: ≤ ↔ <i>maksimal, paling banyak, tidak lebih dari</i>; ≥ ↔ <i>minimal, sekurang-kurangnya</i>. 🗝️' }
+  ]
+};
+</script>
+<script>
+/* ============ 3. KELAS KUIS ============ */
+class Quiz {
+  constructor(mount, data){
+    this.data = data;
+    this.mount = mount;
+    this.reset(true);
+  }
+  reset(first){
+    this.i = 0;
+    this.score = 0;
+    this.state = this.data.questions.map(() => ({ picked: null, val: '', checked: false, correct: false }));
+    this.done = false;
+    this.render(first);
+  }
+  render(){
+    const d = this.data, n = d.questions.length;
+    const st = this.state[this.i], q = d.questions[this.i];
+    const pct = n ? Math.round(this.score / n * 100) : 0;
+    let dots = '';
+    for(let k = 0; k < n; k++){
+      const s = this.state[k];
+      dots += '<button class="qdot ' + (k === this.i ? 'cur' : '') + (s.checked ? (s.correct ? ' right' : ' wrong') : '') + '" data-k="' + k + '" title="Soal ' + (k+1) + '">' + (k+1) + '</button>';
+    }
+    let body = '';
+    if(this.done){
+      let msg;
+      if(pct >= 90) msg = '🏆 <b>Luar biasa!</b> Kamu benar-benar menguasai materi ini — siap melangkah ke soal cerita!';
+      else if(pct >= 70) msg = '🎉 <b>Bagus sekali!</b> Sedikit penguatan pada soal yang salah, lalu kamu siap!';
+      else if(pct >= 50) msg = '💪 <b>Cukup baik!</b> Baca ulang pembahasan soal yang salah, lalu coba lagi — kamu pasti bisa!';
+      else msg = '🌱 <b>Tidak apa-apa!</b> Perjalanan belajar memang bertahap. Baca ulang materi di slide sebelumnya, lalu ulangi kuisnya. Semangat!';
+      body = '<div class="qresult show"><div class="bigscore">' + this.score + ' / ' + n + '</div>'
+           + '<p class="msg">' + msg + '</p>'
+           + '<button class="btn btn-primary qrestart">↺ Ulangi Kuis</button></div>';
+    } else {
+      let opts = '';
+      if(q.type === 'input'){
+        opts = '<div class="qinput-row"><input class="qinput" type="text" inputmode="decimal" placeholder="' + (q.ph || 'jawaban…') + '" value="' + (st.val || '') + '" ' + (st.checked ? 'disabled' : '') + '><span class="muted small">' + (q.unit || '') + '</span></div>';
+      } else {
+        const letters = ['A','B','C','D','E'];
+        opts = '<div class="qopts">' + q.opts.map((o, k) => {
+          let cls = 'qopt';
+          if(st.checked){ if(k === q.ans) cls += ' correct'; else if(k === st.picked) cls += ' wrong'; }
+          else if(st.picked === k) cls += ' picked';
+          return '<button class="' + cls + '" data-k="' + k + '" ' + (st.checked ? 'disabled' : '') + '><span class="letter">' + letters[k] + '</span><span>' + o + '</span></button>';
+        }).join('') + '</div>';
+      }
+      const feed = st.checked ? (st.correct
+          ? '<div class="qfeed good">✅ Benar! Hebat! 🎊</div>'
+          : '<div class="qfeed bad">❌ Belum tepat. Jawaban yang benar: <b>' + this.correctText(q) + '</b></div>') : '';
+      const exp = st.checked ? '<div class="qexp show"><div class="qh">💡 Pembahasan</div>' + q.exp + '</div>' : '<div class="qexp"></div>';
+      body = '<div class="qmeta"><span class="qcount">SOAL ' + (this.i+1) + ' DARI ' + n + '</span><div class="qdots">' + dots + '</div></div>'
+           + '<div class="qtext">' + q.q + '</div>' + opts + feed + exp
+           + '<div class="qacts">'
+           + '<button class="btn btn-ghost qprev" ' + (this.i === 0 ? 'disabled' : '') + '>← Sebelumnya</button>'
+           + (st.checked ? '' : '<button class="btn btn-primary qcheck" ' + (this.hasAnswer() ? '' : 'disabled') + '>✅ Periksa Jawaban</button>')
+           + '<button class="btn btn-success qnext" ' + (st.checked ? '' : 'disabled') + '>' + (this.i === n-1 ? '🏁 Lihat Hasil' : 'Lanjut →') + '</button>'
+           + '</div>';
+    }
+    this.mount.innerHTML =
+      '<div class="quiz"><div class="quiz-top"><span class="qt">' + d.title + ' — Latihan Soal</span>'
+      + '<span class="score-chip">⭐ Skor: ' + this.score + '/' + n + '</span></div>'
+      + '<div class="quiz-body">' + body + '</div></div>';
+    this.bind();
+  }
+  correctText(q){
+    if(q.type === 'input') return '<b>' + q.ans + '</b>';
+    return '<b>' + ['A','B','C','D','E'][q.ans] + '. ' + q.opts[q.ans] + '</b>';
+  }
+  hasAnswer(){
+    const q = this.data.questions[this.i], st = this.state[this.i];
+    return q.type === 'input' ? String(st.val).trim().length > 0 : st.picked !== null;
+  }
+  bind(){
+    const mount = this.mount;
+    mount.querySelectorAll('.qopt').forEach(b => b.addEventListener('click', () => {
+      this.state[this.i].picked = +b.dataset.k; this.render();
+    }));
+    const inp = mount.querySelector('.qinput');
+    if(inp) inp.addEventListener('input', () => { this.state[this.i].val = inp.value; this.render(); const ni = mount.querySelector('.qinput'); if(ni){ ni.focus(); ni.setSelectionRange(ni.value.length, ni.value.length); } });
+    const chk = mount.querySelector('.qcheck');
+    if(chk) chk.addEventListener('click', () => {
+      const q = this.data.questions[this.i], st = this.state[this.i];
+      if(q.type === 'input'){
+        const num = parseFloat(String(st.val).trim().replace(',', '.'));
+        st.correct = !isNaN(num) && Math.abs(num - q.ans) < 0.01;
+      } else {
+        st.correct = (st.picked === q.ans);
+      }
+      st.checked = true;
+      if(st.correct) this.score++;
+      this.render();
+    });
+    mount.querySelectorAll('.qdot').forEach(b => b.addEventListener('click', () => { this.i = +b.dataset.k; this.render(); }));
+    const pv = mount.querySelector('.qprev'); if(pv) pv.addEventListener('click', () => { this.i--; this.render(); });
+    const nx = mount.querySelector('.qnext'); if(nx) nx.addEventListener('click', () => { if(this.i === this.data.questions.length - 1){ this.done = true; this.render(); } else { this.i++; this.render(); } });
+    const rs = mount.querySelector('.qrestart'); if(rs) rs.addEventListener('click', () => this.reset());
+  }
+}
+function initQuizzes(){
+  document.querySelectorAll('.quiz-mount').forEach(m => {
+    const key = m.dataset.quiz;
+    if(QUIZ[key]) new Quiz(m, QUIZ[key]);
+  });
+}
+
+/* ============ 4. DATA KUIS MATERI 3–5 ============ */
+QUIZ.m3 = {
+  title: '📘 Materi 3',
+  questions: [
+    { q: '<b>Titik pojok</b> dari suatu daerah penyelesaian adalah…',
+      opts: ['titik potong grafik dengan judul soal', 'titik-titik potong antar garis batas yang membentuk "sudut" daerah penyelesaian', 'sembarang titik di dalam daerah', 'titik potong sumbu-x dengan judul'],
+      ans: 1, exp: 'Titik pojok = titik potong <b>garis-garis batas</b> (termasuk sumbu koordinat) yang menjadi "sudut" daerah penyelesaian. Di sanalah nilai optimum biasa ditemukan. 📍' },
+    { q: 'Tentukan titik potong garis <b>x + y = 6</b> dan <b>x − y = 2</b>!',
+      type: 'input', ans: '4,2', ph: 'mis. 4, 2', coord: true, exp: 'Eliminasi: jumlahkan kedua persamaan → (x+y) + (x−y) = 6 + 2 → 2x = 8 → <b>x = 4</b>. Substitusi: 4 + y = 6 → <b>y = 2</b>. Titik potongnya <b>(4, 2)</b>. ✨' },
+    { q: 'Garis <b>2x + y = 8</b> memotong <b>sumbu-x</b> di titik…',
+      opts: ['(0, 8)', '(8, 0)', '(4, 0)', '(0, 4)'],
+      ans: 2, exp: 'Sumbu-x berarti y = 0 → 2x = 8 → x = 4 → titik <b>(4, 0)</b>. Cek: 2(4) + 0 = 8 ✓' },
+    { q: 'Garis <b>2x + y = 8</b> memotong <b>sumbu-y</b> di titik…',
+      opts: ['(0, 8)', '(8, 0)', '(4, 0)', '(0, 4)'],
+      ans: 0, exp: 'Sumbu-y berarti x = 0 → y = 8 → titik <b>(0, 8)</b>. Titik potong sumbu inilah "jangkar" gambar grafik! ⚓' },
+    { q: 'Tentukan titik potong garis <b>x + 2y = 8</b> dan <b>2x + y = 10</b>!',
+      type: 'input', ans: '4,2', ph: 'mis. 4, 2', coord: true, exp: 'Substitusi: dari pers.1, x = 8 − 2y. Masukkan ke pers.2: 2(8 − 2y) + y = 10 → 16 − 3y = 10 → y = 2, lalu x = 8 − 4 = 4. Titik potong <b>(4, 2)</b>. 🎯' },
+    { q: 'Titik pojok daerah dengan kendala <b>x ≥ 0, y ≥ 0, x + y ≤ 4</b> adalah…',
+      opts: ['(0,0), (4,0), (0,4)', '(0,0), (4,0), (0,4), (4,4)', '(4,0) dan (0,4) saja', '(0,0) dan (2,2)'],
+      ans: 0, exp: 'Daerahnya segitiga: (0,0) dari kedua sumbu, (4,0) dari garis x + y = 4 dengan sumbu-x, dan (0,4) dengan sumbu-y. Titik (4,4) berada di luar kendala (4+4=8 &gt; 4). 📐' },
+    { q: 'Pada sistem <b>2x + y = 12</b> dan <b>x + y = 8</b>, eliminasi (kurangkan kedua persamaan) langsung menghasilkan x = …',
+      type: 'input', ans: 4, ph: 'mis. 4', exp: '(2x + y) − (x + y) = 12 − 8 → x = <b>4</b>. Lalu substitusi: 4 + y = 8 → y = 4. Titik potongnya (4, 4) — eliminasi sangat efisien ketika koefisien y sudah sama! ⚡' },
+    { q: 'Titik potong garis <b>x + y = 6</b> dan <b>2x + y = 8</b> adalah…',
+      opts: ['(2, 4)', '(4, 2)', '(6, 8)', '(0, 0)'],
+      ans: 0, exp: 'Eliminasi: (2x + y) − (x + y) = 8 − 6 → x = 2. Substitusi: 2 + y = 6 → y = 4. Titik potong <b>(2, 4)</b>. Cek di pers.2: 2(2) + 4 = 8 ✓' },
+    { q: 'Apakah <b>setiap</b> titik potong dua garis batas pasti menjadi titik pojok daerah penyelesaian?',
+      opts: ['Ya, selalu', 'Tidak — hanya yang terletak pada batas daerah (memenuhi semua kendala)', 'Hanya jika di kuadran III', 'Hanya jika berimpit dengan O(0,0)'],
+      ans: 1, exp: 'Titik potong hanya jadi titik pojok bila <b>memenuhi semua kendala</b> (ada di tepi daerah). Misalnya potong garis 2x + y = 12 dengan sumbu-x bisa saja di luar daerah jika kendala lain menolaknya. 🧐' },
+    { q: 'Daerah dengan kendala <b>x ≥ 0, y ≥ 0, x + y ≤ 10</b> memiliki titik pojok…',
+      opts: ['(0,0), (10,0), (0,10)', '(10,10)', '(0,0) dan (10,10)', 'hanya (5,5)'],
+      ans: 0, exp: 'Segitiga dengan sudut di O(0,0), potong sumbu-x (10,0), dan potong sumbu-y (0,10). (10,10) ditolak karena 10+10=20 &gt; 10. 🗺️' }
+  ]
+};
+QUIZ.m4 = {
+  title: '📘 Materi 4',
+  questions: [
+    { q: 'Langkah <b>pertama</b> menggambar grafik kendala <b>2x + 3y ≤ 12</b> adalah…',
+      opts: ['mencari dua titik potong garis 2x + 3y = 12 dengan sumbu', 'menghitung luas daerah penyelesaian', 'mengarsir daerah kotor terlebih dahulu', 'mencari nilai maksimum fungsi tujuan'],
+      ans: 0, exp: 'Grafik selalu dimulai dari <b>garis batasnya</b>: cari titik potong dengan sumbu-x (y=0) dan sumbu-y (x=0), hubungkan, lalu tentukan daerahnya dengan titik uji. 🪜' },
+    { q: 'Garis <b>3x + 2y = 12</b> memotong <b>sumbu-x</b> di titik…',
+      type: 'input', ans: '4,0', ph: 'mis. 4, 0', coord: true, exp: 'y = 0 → 3x = 12 → x = 4 → titik <b>(4, 0)</b>. Catat kedua jangkar garis sebelum menggambar! ✏️' },
+    { q: 'Garis <b>3x + 2y = 12</b> memotong <b>sumbu-y</b> di titik…',
+      type: 'input', ans: '0,6', ph: 'mis. 0, 6', coord: true, exp: 'x = 0 → 2y = 12 → y = 6 → titik <b>(0, 6)</b>. Dengan (4,0) dan (0,6), garisnya siap digambar. 📏' },
+    { q: 'Uji titik (0,0) pada kendala <b>2x + y ≤ 8</b> menghasilkan 0 ≤ 8 yang BENAR. Artinya…',
+      opts: ['daerah penyelesaian memuat (0,0)', 'daerah penyelesaian tidak memuat (0,0)', 'garis batas melalui (0,0)', 'pertidaksamaan tidak punya daerah'],
+      ans: 0, exp: 'Hasil uji BENAR → (0,0) <b>termasuk</b> daerah → arsir sisi yang memuat (0,0), yaitu sisi bawah-kiri garis 2x + y = 8. 🟢' },
+    { q: 'Uji titik (0,0) pada kendala <b>x − 2y ≥ 4</b> menghasilkan 0 ≥ 4 yang SALAH. Artinya…',
+      opts: ['daerah memuat (0,0)', 'daerah penyelesaian <b>tidak</b> memuat (0,0) — arsir sisi seberangnya', 'garis melalui (0,0)', 'kendala ini tidak boleh dipakai'],
+      ans: 1, exp: 'Hasil uji SALAH → (0,0) ditolak → daerah yang benar ada di <b>seberang</b> (0,0), yaitu sisi kanan-atas garis x − 2y = 4. Ini contoh nyata manfaat titik uji! 🧪' },
+    { q: 'Teknik <b>"daerah kotor"</b> dalam menggambar grafik berarti…',
+      opts: ['mengarsir langsung daerah yang memenuhi semua kendala', 'mencoret (mengarsir) daerah yang TIDAK memenuhi tiap kendala satu per satu, sehingga sisa yang bersih adalah daerah penyelesaian', 'mengarsir seluruh bidang koordinat', 'menghapus seluruh grafik'],
+      ans: 1, exp: 'Daerah kotor = menolak area yang salah: coret sisi yang ditolak kendala 1, lalu kendala 2, dst. <b>Area yang tersisa bersih (tak tercoret)</b> = irisan = daerah penyelesaian. 🟥➡️⬜' },
+    { q: '<b>Irisan daerah</b> dari beberapa pertidaksamaan berarti daerah yang…',
+      opts: ['memenuhi salah satu kendala saja', 'memenuhi SEMUA kendala sekaligus', 'berada di luar semua kendala', 'berbentuk lingkaran'],
+      ans: 1, exp: 'Daerah penyelesaian sistem = <b>irisan</b> semua daerah masing-masing kendala — daerah yang sekaligus memenuhi semuanya. Simbol irisan: ∩. ➕' },
+    { q: 'Kendala <b>x ≥ 4</b> digambarkan sebagai…',
+      opts: ['garis vertikal melalui (4, 0) dengan daerah di sebelah kanannya', 'garis horizontal melalui (0, 4)', 'garis miring melalui (4, 4)', 'garis putus-putus melalui (4, 0)'],
+      ans: 0, exp: 'x = 4 tidak memuat y → garis <b>vertikal</b> (tegak) melalui (4,0). Karena x harus ≥ 4, daerahnya di <b>kanan</b> garis. Garis horizontal y = 3 → daerah atas/bawahnya. 📊' },
+    { q: 'Kendala <b>y ≥ 2</b> berarti daerah penyelesaiannya berada…',
+      opts: ['di atas garis horizontal y = 2', 'di bawah garis horizontal y = 2', 'di kiri garis vertikal x = 2', 'hanya di titik (0, 2)'],
+      ans: 0, exp: 'y = 2 adalah garis <b>horizontal</b>; y ≥ 2 meminta nilai y tidak kurang dari 2 → semua titik <b>di atas</b> garis itu (termasuk garisnya). ⬆️' },
+    { q: 'Grafik daerah penyelesaian <b>x + y ≤ 6, x ≥ 0, y ≥ 0</b> adalah segitiga dengan titik pojok…',
+      opts: ['(0,0), (6,0), (0,6)', '(6,6)', '(0,0), (6,6), (0,6)', '(1,1), (2,2), (3,3)'],
+      ans: 0, exp: 'Kendala x ≥ 0, y ≥ 0 menempelkan daerah pada kuadran I; garis x + y = 6 memotong sumbu di (6,0) dan (0,6). Hasilnya segitiga O(0,0)–(6,0)–(0,6). 🔺' }
+  ]
+};
+QUIZ.m5 = {
+  title: '📘 Materi 5',
+  questions: [
+    { q: 'Cara menentukan nilai maksimum/minimum fungsi tujuan pada daerah penyelesaian adalah…',
+      opts: ['menebak satu titik bebas', 'mensubstitusikan setiap TITIK POJOK ke fungsi tujuan lalu membandingkan hasilnya', 'menghitung luas daerah penyelesaian', 'mengukur panjang garis batas'],
+      ans: 1, exp: 'Berdasarkan <b>Teorema Titik Pojok</b>, nilai optimum pasti ada di titik pojok → cukup evaluasi 3–5 titik itu dan bandingkan. Efisien! 🏆' },
+    { q: 'Diketahui f(x, y) = 5x + 4y. Nilai f di titik <b>(2, 4)</b> adalah…',
+      type: 'input', ans: 26, ph: 'mis. 26', exp: 'f(2, 4) = 5(2) + 4(4) = 10 + 16 = <b>26</b>. Inilah nilai tertinggi di antara keempat titik pojok contoh kita. ⭐' },
+    { q: 'Titik pojok suatu daerah: O(0,0), A(4,0), B(2,4), C(0,6). Dengan f = 5x + 4y, nilai f di A, B, C berturut-turut 20, 26, 24, dan di O bernilai 0. Nilai <b>maksimum</b>-nya adalah…',
+      opts: ['20', '24', '26', '0'],
+      ans: 2, exp: 'Bandingkan semua: 0, 20, 26, 24 → terbesar <b>26</b> di titik B(2,4). Nilai maksimum selalu disertai <b>letak titiknya</b> saat melapor. 🥇' },
+    { q: 'Titik pojok daerah: A(0,0), B(4,0), C(0,5). Dengan fungsi tujuan <b>f = 3x + 2y</b>, nilai <b>maksimum</b>-nya adalah…',
+      type: 'input', ans: 12, ph: 'mis. 12', exp: 'f(A) = 3(0)+2(0) = 0; f(B) = 3(4)+2(0) = <b>12</b>; f(C) = 3(0)+2(5) = 10. Terbesar = <b>12</b> di B(4,0). 🧮' },
+    { q: 'Titik pojok daerah: (2,0), (5,0), (5,3), (2,5). Dengan f = 4x + y, nilai <b>minimum</b>-nya adalah…',
+      type: 'input', ans: 8, ph: 'mis. 8', exp: 'f(2,0) = 8; f(5,0) = 20; f(5,3) = 23; f(2,5) = 13. Untuk MINIMUM cari yang <b>terkecil</b> = <b>8</b> di (2,0). Jangan terjebak memilih terbesar! ⬇️' },
+    { q: 'Jika dua titik pojok memberikan nilai optimum yang <b>sama besar</b>, maka…',
+      opts: ['jawabannya salah', 'semua titik pada ruas garis penghubung keduanya juga merupakan solusi optimum', 'daerah penyelesaiannya kosong', 'fungsi tujuannya tidak linear'],
+      ans: 1, exp: 'Itu tanda garis f = ax + by <b>sejajar dengan sisi daerah</b> → tak hingga banyak solusi optimum di sepanjang sisi itu. Fenomena "banyak solusi". ♾️' },
+    { q: 'f(x, y) = 2000x + 3000y (rupiah). Nilai f di titik <b>(1, 2)</b> adalah…',
+      type: 'input', ans: 8000, ph: 'mis. 5000', exp: 'f(1,2) = 2000(1) + 3000(2) = 2000 + 6000 = <b>8000</b> → Rp8.000. Perhatikan skala: bila dalam ribuan, jawabnya 8. 📝' },
+    { q: 'Mengapa memeriksa titik pojok saja sudah <b>cukup</b> untuk menemukan nilai optimum?',
+      opts: ['karena kebetulan saja', 'berdasarkan teorema: nilai maksimum/minimum program linear selalu terletak di titik pojok daerah penyelesaian', 'karena guru selalu begitu menyuruh', 'karena daerah penyelesaiannya selalu kecil'],
+      ans: 1, exp: '<b>Teorema Titik Pojok</b> menjamin optimum ada di sudut daerah. Intuisinya: garis f = ax + by "meluncur" dan sentuhan terakhirnya pada daerah selalu di sudut. 🛝' },
+    { q: 'Dengan f = 6x + y, titik (3, 1) memberi nilai 19 dan titik (2, 4) memberi nilai 16. Titik yang memberikan <b>maksimum</b> adalah…',
+      opts: ['(3, 1), karena 19 &gt; 16', '(2, 4), karena 16 &lt; 19', 'keduanya sama-sama maksimum', 'tidak dapat ditentukan'],
+      ans: 0, exp: 'Maksimum = nilai terbesar → 19 di <b>(3,1)</b>. Perhatikan: titik dengan x terbesar belum tentu menang; yang dinilai adalah <b>f</b>, bukan koordinatnya! 🧐' },
+    { q: 'Pada daerah dengan kendala x + y ≥ 4, titik pojoknya (4,0), (0,4), (6,1). Dengan f = 3x + 5y, nilai <b>minimum</b> adalah…',
+      type: 'input', ans: 12, ph: 'mis. 12', exp: 'f(4,0) = 12; f(0,4) = 20; f(6,1) = 18+5 = 23. Terkecil = <b>12</b> di (4,0). Masalah "biaya minimum" berbalik arah dari masalah keuntungan! 💸' }
+  ]
+};
+</script>
+<script>
+/* ============ 5. DATA KUIS MATERI 6–7 + EXIT TICKET ============ */
+QUIZ.m6 = {
+  title: '📘 Materi 6',
+  questions: [
+    { q: 'Langkah <b>pertama</b> menentukan pertidaksamaan dari sebuah grafik adalah…',
+      opts: ['menentukan titik potong garis batas dengan kedua sumbu', 'menebak tanda pertidaksamaan', 'mengarsir ulang seluruh grafik', 'menghitung luas daerah arsiran'],
+      ans: 0, exp: 'Mulai dari <b>garis batasnya</b>: baca titik potong sumbu dari grafik → bentuk persamaan garis → baru tentukan tanda dengan titik uji. Urutannya penting! 🔍' },
+    { q: 'Sebuah garis melalui <b>(4, 0)</b> dan <b>(0, 2)</b>; arsiran berada pada sisi yang <b>memuat (0,0)</b>; garis digambar penuh. Pertidaksamaannya adalah…',
+      opts: ['x + 2y ≤ 4', 'x + 2y ≥ 4', '2x + y ≤ 4', 'x − 2y ≤ 4'],
+      ans: 0, exp: 'Bentuk potong-sumbu: x/4 + y/2 = 1 → kalikan 4 → <b>x + 2y = 4</b>. Uji (0,0): 0 ≤ 4 ✓ (sesuai arsiran memuat origin) → <b>x + 2y ≤ 4</b>. ✅' },
+    { q: 'Garis melalui <b>(6, 0)</b> dan <b>(0, 4)</b>; arsiran <b>TIDAK memuat (0,0)</b>. Pertidaksamaannya adalah…',
+      opts: ['2x + 3y ≤ 12', '2x + 3y ≥ 12', '3x + 2y ≥ 12', 'x + y ≥ 12'],
+      ans: 1, exp: 'x/6 + y/4 = 1 → kalikan 12 → <b>2x + 3y = 12</b>. Uji (0,0): 0 ≥ 12 ✗ → daerah di seberang origin → <b>2x + 3y ≥ 12</b>. 🧪' },
+    { q: 'Garis <b>horizontal</b> y = 3 dengan arsiran di <b>bawahnya</b>. Pertidaksamaannya adalah…',
+      opts: ['y ≤ 3', 'y ≥ 3', 'x ≤ 3', 'x ≥ 3'],
+      ans: 0, exp: 'Garis mendatar adalah y = 3 (nilai y konstan). Arsiran di bawah → y ≤ 3. Kalau arsiran di atas, jawabnya y ≥ 3. ⬇️' },
+    { q: 'Garis <b>vertikal</b> x = 5 dengan arsiran di <b>sebelah kanannya</b>. Pertidaksamaannya adalah…',
+      opts: ['x ≥ 5', 'x ≤ 5', 'y ≥ 5', 'y ≤ 5'],
+      ans: 0, exp: 'Garis tegak adalah x = 5. Arsiran di kanan berarti semua x ≥ 5 → <b>x ≥ 5</b>. Vertikal ↔ x, horizontal ↔ y. 📊' },
+    { q: 'Cara paling tepat menentukan tanda ≤ atau ≥ dari grafik adalah…',
+      opts: ['menebak dari kemiringan garis', 'menguji satu titik yang berada di daerah arsiran', 'menghitung luas arsiran', 'melihat warna arsiran'],
+      ans: 1, exp: 'Pilih titik yang jelas berada di daerah arsiran (sering (0,0)), substitusikan ke persamaan garis: pernyataan benar → <b>≤</b>-nya, salah → <b>≥</b>-nya (disesuaikan). Metode ilmiah! 🧪' },
+    { q: 'Garis melalui <b>(2, 0)</b> dan <b>(0, 3)</b>; arsiran pada sisi yang <b>TIDAK memuat (0,0)</b>. Pertidaksamaannya adalah…',
+      opts: ['3x + 2y ≥ 6', '3x + 2y ≤ 6', '2x + 3y ≤ 6', 'x + y ≥ 6'],
+      ans: 0, exp: 'x/2 + y/3 = 1 → kalikan 6 → <b>3x + 2y = 6</b>. Uji (0,0): 0 ≥ 6 ✗ → arsiran di seberang (0,0) → <b>3x + 2y ≥ 6</b>. ✔️' },
+    { q: 'Grafik menunjukkan daerah yang hanya berada di <b>kuadran pertama</b>. Kendala yang sesuai adalah…',
+      opts: ['x ≥ 0 dan y ≥ 0', 'x ≤ 0 dan y ≤ 0', 'x = y', 'x + y = 0'],
+      ans: 0, exp: 'Kuadran I = x positif dan y positif → kendala non-negatif <b>x ≥ 0, y ≥ 0</b>. Dua sumbu koordinat pun berperan sebagai garis batas! 📐' },
+    { q: 'Garis melalui <b>(5, 0)</b> dan <b>(0, 5)</b>; arsiran memuat <b>(0,0)</b>. Pertidaksamaannya adalah…',
+      opts: ['x + y ≤ 5', 'x + y ≥ 5', 'x − y ≤ 5', 'x · y ≤ 5'],
+      ans: 0, exp: 'x/5 + y/5 = 1 → kalikan 5 → <b>x + y = 5</b>. Uji (0,0): 0 ≤ 5 ✓ → arsiran memuat origin → <b>x + y ≤ 5</b>. ⚡ (Bentuk potong-sumbu memang jalan pintas!)' },
+    { q: 'Garis batas pada grafik digambar <b>putus-putus</b>. Ini menunjukkan tandanya…',
+      opts: ['≤ atau ≥', '&lt; atau &gt;', '=', 'tidak bermakna'],
+      ans: 1, exp: 'Garis putus-putus berarti titik-titik <b>pada garis TIDAK termasuk</b> daerah → tanda ketat <b>&lt; / &gt;</b>. Garis penuh ↔ ≤ / ≥. Detail kecil yang sering ditanya guru! 🚨' }
+  ]
+};
+QUIZ.m7 = {
+  title: '📘 Materi 7 — Level Bos',
+  questions: [
+    { q: '<b>Kasus:</b> roti cokelat (x) &amp; roti keju (y); tepung: cokelat 2 kg, keju 1 kg, tersedia 12 kg; oven: 1 jam tiap roti, tersedia 8 jam; untung cokelat Rp8.000, keju Rp6.000. Variabel keputusan yang tepat adalah…',
+      opts: ['x = banyak roti cokelat, y = banyak roti keju', 'x = harga tepung, y = harga roti', 'x = lama memanggang, y = banyak oven', 'x = keuntungan, y = tepung'],
+      ans: 0, exp: 'Variabel keputusan adalah nilai yang <b>ingin kita putuskan</b> — yaitu berapa banyak tiap jenis roti dibuat: x = banyak cokelat, y = banyak keju. Semua model ditulis dari sini. 🎯' },
+    { q: 'Dari kasus di atas, fungsi kendala untuk <b>tepung</b> adalah…',
+      opts: ['2x + y ≤ 12', '2x + y ≥ 12', 'x + 2y ≤ 12', '2x − y ≤ 12'],
+      ans: 0, exp: 'Tepung terpakai = 2x (cokelat) + y (keju) kg, dan tidak boleh melebihi persediaan 12 kg → <b>2x + y ≤ 12</b>. "Tersedia/tidak lebih dari" → ≤. 🌾' },
+    { q: 'Fungsi kendala untuk <b>waktu oven</b> adalah…',
+      opts: ['x + y ≤ 8', 'x + y ≥ 8', 'x − y ≤ 8', '2x + 2y ≤ 8'],
+      ans: 0, exp: 'Tiap roti butuh 1 jam → total x + y jam, maksimal 8 jam → <b>x + y ≤ 8</b>. Ditambah kendala non-negatif x ≥ 0, y ≥ 0. ⏰' },
+    { q: 'Fungsi tujuan dari kasus tersebut adalah…',
+      opts: ['f = 8x + 6y', 'f = 6x + 8y', 'f = 2x + y', 'f = 8x − 6y'],
+      ans: 0, exp: 'Untung cokelat 8 (ribuan) per unit dan keju 6 per unit → f(x, y) = <b>8x + 6y</b>, dimaksimumkan. Koefisien mengikuti untung tiap jenis roti. 💰' },
+    { q: 'Titik potong garis <b>2x + y = 12</b> dengan <b>sumbu-x</b> adalah…',
+      type: 'input', ans: '6,0', ph: 'mis. 6, 0', coord: true, exp: 'y = 0 → 2x = 12 → x = 6 → <b>(6, 0)</b>. Titik ini kelak menjadi titik pojok A dari daerah penyelesaian. 📍' },
+    { q: 'Titik potong kedua garis batas <b>2x + y = 12</b> dan <b>x + y = 8</b> adalah…',
+      type: 'input', ans: '4,4', ph: 'mis. 4, 4', coord: true, exp: 'Eliminasi: (2x + y) − (x + y) = 12 − 8 → x = 4. Substitusi: 4 + y = 8 → y = 4 → <b>(4, 4)</b>. Cek tepung: 2(4) + 4 = 12 ≤ 12 ✓ oven 8 ≤ 8 ✓ — sah sebagai titik pojok! 🌟' },
+    { q: 'Keempat titik pojok daerah penyelesaian kasus roti adalah…',
+      opts: ['O(0,0), A(6,0), B(4,4), C(0,8)', 'O(0,0), A(8,0), B(4,4), C(0,6)', 'A(6,0) dan B(4,4) saja', 'O(0,0) saja'],
+      ans: 0, exp: 'Daerah dibentuk 2 garis batas + 2 sumbu: O(0,0) → A(6,0) di sumbu-x → B(4,4) potong kedua garis → C(0,8) di sumbu-y. Empat sudut, empat kandidat optimum. 🔲' },
+    { q: 'Nilai fungsi tujuan <b>f = 8x + 6y</b> di titik <b>B(4, 4)</b> adalah…',
+      type: 'input', ans: 56, ph: 'mis. 56', exp: 'f(4,4) = 8(4) + 6(4) = 32 + 24 = <b>56</b> (ribuan rupiah) = Rp56.000. Bandingkan: f(6,0) = 48 dan f(0,8) = 48 — B unggul! 🏆' },
+    { q: 'Kesimpulan akhir kasus roti (nilai f: O=0, A=48, B=56, C=48) adalah…',
+      opts: ['buat 4 roti cokelat &amp; 4 roti keju → keuntungan maksimum Rp56.000', 'buat 6 roti cokelat saja → Rp48.000', 'buat 8 roti keju saja → Rp48.000', 'buat 8 roti cokelat &amp; 8 roti keju → Rp112.000'],
+      ans: 0, exp: 'Nilai maksimum 56 ada di B(4,4) → produksi <b>4 cokelat + 4 keju</b>. Pilihan D justru melanggar kendala (tepun 24 kg &gt; 12 kg, oven 16 jam &gt; 8 jam) — selalu cek kelayakan! 🚨' },
+    { q: 'Urutan langkah penyelesaian soal cerita program linear yang benar adalah…',
+      opts: ['model matematika → grafik → titik pojok → evaluasi → kesimpulan', 'grafik → model → evaluasi → kesimpulan', 'titik pojok → model → grafik → kesimpulan', 'evaluasi → grafik → model → kesimpulan'],
+      ans: 0, exp: 'Enam langkah emas: pahami &amp; tabel → variabel → <b>model</b> (kendala + tujuan) → <b>grafik</b> → <b>titik pojok</b> → <b>evaluasi &amp; tafsirkan</b>. Kuasai urutannya, semua soal cerita jadi terstruktur! 🗝️' }
+  ]
+};
+QUIZ.exit = {
+  title: '🎫 Exit Ticket',
+  questions: [
+    { q: 'Sebuah toko menjual roti (x) Rp5.000 dan kue (y) Rp8.000 per buah. Modal maksimal Rp120.000, dan roti yang tersedia maksimal 15 buah. Model program lengkapnya adalah…',
+      opts: ['5x + 8y ≤ 120, x ≤ 15, x ≥ 0, y ≥ 0', '5x + 8y ≥ 120 dan x ≤ 15', '5x + 8y ≤ 120 saja tanpa kendala lain', '5x − 8y ≤ 120, x ≥ 0'],
+      ans: 0, exp: 'Modal (ribuan): 5x + 8y ≤ 120; stok roti: x ≤ 15; dan wajib <b>kendala non-negatif</b> x ≥ 0, y ≥ 0. Model lengkap mencakup SEMUA kendala. 🧾' },
+    { q: 'Titik potong garis <b>x + y = 7</b> dan <b>2x − y = 5</b> adalah…',
+      type: 'input', ans: '4,3', ph: 'mis. 4, 3', coord: true, exp: 'Jumlahkan keduanya (y saling lenyap): 3x = 12 → x = 4; substitusi: 4 + y = 7 → y = 3 → <b>(4, 3)</b>. Teknik eliminasi murni! ⚡' },
+    { q: 'Diketahui titik-titik (1,1), (3,0), (0,4), (2,2) dan fungsi tujuan <b>f = 4x + 3y</b>. Nilai <b>maksimum</b>-nya adalah…',
+      type: 'input', ans: 14, ph: 'mis. 14', exp: 'f(1,1) = 7; f(3,0) = 12; f(0,4) = 12; f(2,2) = 8+6 = <b>14</b>. Maksimum <b>14</b> di (2,2). Substitusi rapi per titik = kunci. 🧮' },
+    { q: 'Menurut <b>Teorema Titik Pojok</b>, nilai maksimum/minimum fungsi tujuan selalu terletak di…',
+      opts: ['titik mana pun di daerah penyelesaian', 'titik pojok daerah penyelesaian', 'titik pusat daerah', 'di luar daerah penyelesaian'],
+      ans: 1, exp: 'Nilai optimum program linear selalu "bersemayam" di <b>titik pojok</b> daerah penyelesaian. Itulah alasan kita berjuang mencari titik potong garis batas! ⭐' }
+  ]
+};
+
+/* ============ 6. INIT KUIS ============ */
+initQuizzes();
+</script>
+<script>
+/* ============ 7. PUSTAKA GRAFIK SVG ============ */
+function el(tag, attrs, parent){
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(e);
+  return e;
+}
+function fmt(v){ return (+(+v).toFixed(2)).toString(); }
+function polyPts(poly, G){ return poly.map(p => G.X(p[0]).toFixed(1) + ',' + G.Y(p[1]).toFixed(1)).join(' '); }
+function mkGraph(svg, opt){
+  opt = opt || {};
+  const vb = (svg.getAttribute('viewBox') || '0 0 460 340').split(' ');
+  const W = +vb[2], H = +vb[3];
+  const ML = opt.ml != null ? opt.ml : 44, MR = opt.mr != null ? opt.mr : 14;
+  const MT = opt.mt != null ? opt.mt : 16, MB = opt.mb != null ? opt.mb : 36;
+  const max = opt.max || 10;
+  const pw = W - ML - MR, ph = H - MT - MB;
+  const X = v => ML + v / max * pw;
+  const Y = v => MT + (1 - v / max) * ph;
+  const uid = 'clip' + Math.random().toString(36).slice(2, 9);
+  const defs = el('defs', {}, svg);
+  const cp = el('clipPath', {id: uid}, defs);
+  el('rect', {x: ML, y: MT, width: pw, height: ph}, cp);
+  const gGrid = el('g', {}, svg);
+  for(let i = 0; i <= max; i++){
+    el('line', {x1: X(i), y1: Y(0), x2: X(i), y2: Y(max), stroke: '#edf1f7', 'stroke-width': 1}, gGrid);
+    el('line', {x1: X(0), y1: Y(i), x2: X(max), y2: Y(i), stroke: '#edf1f7', 'stroke-width': 1}, gGrid);
+  }
+  el('line', {x1: X(0), y1: Y(0), x2: X(max), y2: Y(0), stroke: '#94a3b8', 'stroke-width': 2}, svg);
+  el('line', {x1: X(0), y1: Y(0), x2: X(0), y2: Y(max), stroke: '#94a3b8', 'stroke-width': 2}, svg);
+  for(let i = 2; i <= max; i += 2){
+    el('text', {x: X(i), y: Y(0) + 17, 'text-anchor': 'middle', 'font-size': 11.5, fill: '#94a3b8', 'font-family': 'Poppins, sans-serif'}, svg).textContent = i;
+    el('text', {x: X(0) - 15, y: Y(i) + 4, 'text-anchor': 'middle', 'font-size': 11.5, fill: '#94a3b8', 'font-family': 'Poppins, sans-serif'}, svg).textContent = i;
+  }
+  el('text', {x: X(max), y: Y(0) + 32, 'text-anchor': 'end', 'font-size': 12.5, fill: '#64748b', 'font-weight': 700, 'font-style': 'italic', 'font-family': 'Poppins, sans-serif'}, svg).textContent = 'x';
+  el('text', {x: X(0) - 28, y: Y(max) + 6, 'font-size': 12.5, fill: '#64748b', 'font-weight': 700, 'font-style': 'italic', 'font-family': 'Poppins, sans-serif'}, svg).textContent = 'y';
+  el('text', {x: X(0) - 12, y: Y(0) + 18, 'text-anchor': 'middle', 'font-size': 11.5, fill: '#64748b', 'font-weight': 700, 'font-family': 'Poppins, sans-serif'}, svg).textContent = 'O';
+  const gClip = el('g', {'clip-path': 'url(#' + uid + ')'}, svg);
+  const gTop = el('g', {}, svg);
+  return {svg, X, Y, W, H, max, defs, gClip, gTop};
+}
+function clipSeg(p1, p2, max){
+  const x1 = p1[0], y1 = p1[1], x2 = p2[0], y2 = p2[1];
+  const dx = x2 - x1, dy = y2 - y1;
+  const p = [-dx, dx, -dy, dy], q = [x1, max - x1, y1, max - y1];
+  let t0 = 0, t1 = 1;
+  for(let i = 0; i < 4; i++){
+    if(Math.abs(p[i]) < 1e-12){ if(q[i] < 0) return null; }
+    else {
+      const r = q[i] / p[i];
+      if(p[i] < 0){ if(r > t1) return null; if(r > t0) t0 = r; }
+      else { if(r < t0) return null; if(r < t1) t1 = r; }
+    }
+  }
+  return [[x1 + t0 * dx, y1 + t0 * dy], [x1 + t1 * dx, y1 + t1 * dy]];
+}
+function drawLine(G, a, b, c, color, opt){
+  opt = opt || {};
+  let p1, p2;
+  if(Math.abs(b) < 1e-9){ p1 = [c / a, 0]; p2 = [c / a, G.max]; }
+  else if(Math.abs(a) < 1e-9){ p1 = [0, c / b]; p2 = [G.max, c / b]; }
+  else { p1 = [0, c / b]; p2 = [G.max, (c - a * G.max) / b]; }
+  const seg = clipSeg(p1, p2, G.max);
+  if(!seg) return null;
+  const s1 = seg[0], s2 = seg[1];
+  const g = opt.parent || G.gClip;
+  el('line', {x1: G.X(s1[0]), y1: G.Y(s1[1]), x2: G.X(s2[0]), y2: G.Y(s2[1]), stroke: color, 'stroke-width': opt.w || 3.5, 'stroke-dasharray': opt.dash || 'none', 'stroke-linecap': 'round'}, g);
+  if(opt.label){
+    const mx = (s1[0] + s2[0]) / 2, my = (s1[1] + s2[1]) / 2;
+    const t = el('text', {x: G.X(mx), y: G.Y(my) - 9, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 800, fill: color, 'paint-order': 'stroke', stroke: '#ffffff', 'stroke-width': 5, 'font-family': 'Poppins, sans-serif'}, g);
+    t.textContent = opt.label;
+  }
+  return seg;
+}
+function clipHalf(poly, a, b, c, keepGE){
+  const sat = p => keepGE ? (a * p[0] + b * p[1] >= c - 1e-9) : (a * p[0] + b * p[1] <= c + 1e-9);
+  const out = [];
+  const n = poly.length;
+  if(!n) return out;
+  for(let i = 0; i < n; i++){
+    const p = poly[i], q = poly[(i + 1) % n];
+    const ps = sat(p), qs = sat(q);
+    if(ps) out.push(p);
+    if(ps !== qs){
+      const d1 = a * p[0] + b * p[1] - c, d2 = a * q[0] + b * q[1] - c;
+      const t = d1 / (d1 - d2);
+      out.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])]);
+    }
+  }
+  return out;
+}
+function cleanPoly(poly){
+  if(poly.length < 3) return [];
+  const ded = [];
+  for(const p of poly){
+    if(!ded.length || Math.abs(ded[ded.length - 1][0] - p[0]) > 1e-6 || Math.abs(ded[ded.length - 1][1] - p[1]) > 1e-6) ded.push(p);
+  }
+  while(ded.length > 1 && Math.abs(ded[0][0] - ded[ded.length - 1][0]) < 1e-6 && Math.abs(ded[0][1] - ded[ded.length - 1][1]) < 1e-6) ded.pop();
+  const out = [];
+  const n = ded.length;
+  for(let i = 0; i < n; i++){
+    const p0 = ded[(i - 1 + n) % n], p1 = ded[i], p2 = ded[(i + 1) % n];
+    const cross = (p1[0] - p0[0]) * (p2[1] - p1[1]) - (p1[1] - p0[1]) * (p2[0] - p1[0]);
+    if(Math.abs(cross) > 1e-6) out.push(p1);
+  }
+  return out.length >= 3 ? out : [];
+}
+function feasiblePoly(cons, max){
+  max = max || 10;
+  let poly = [[0, 0], [max, 0], [max, max], [0, max]];
+  for(const c of cons){ poly = clipHalf(poly, c.a, c.b, c.c, c.op === 'ge'); if(!poly.length) break; }
+  return cleanPoly(poly);
+}
+function dot(G, parent, x, y, r, fill, strokeW){
+  return el('circle', {cx: G.X(x), cy: G.Y(y), r: r, fill: fill, stroke: '#ffffff', 'stroke-width': strokeW == null ? 2.5 : strokeW}, parent);
+}
+function lbl(G, parent, x, y, text, color, size, anchor){
+  const t = el('text', {x: G.X(x), y: G.Y(y), 'text-anchor': anchor || 'middle', 'font-size': size || 12, 'font-weight': 800, fill: color, 'paint-order': 'stroke', stroke: '#ffffff', 'stroke-width': 4.5, 'font-family': 'Poppins, sans-serif'}, parent);
+  t.textContent = text;
+  return t;
+}
+function shade(G, poly, fill, stroke, w){
+  if(!poly.length) return null;
+  return el('polygon', {points: polyPts(poly, G), fill: fill, stroke: stroke || 'none', 'stroke-width': w || 0, 'stroke-linejoin': 'round'}, G.gClip);
+}
+
+/* ============ 8. APERSEPSI: SIMULASI KANTIN ============ */
+(function(){
+  const apX = document.getElementById('apX'), apY = document.getElementById('apY');
+  if(!apX) return;
+  const apTot = document.getElementById('apTot'), apStat = document.getElementById('apStat');
+  const apXv = document.getElementById('apXv'), apYv = document.getElementById('apYv');
+  function upd(){
+    const x = +apX.value, y = +apY.value;
+    apXv.textContent = x; apYv.textContent = y;
+    const tot = 10 * x + 5 * y;
+    apTot.textContent = tot;
+    if(tot <= 20){ apStat.className = 'chip g'; apStat.textContent = '✅ Masih sesuai anggaran (' + tot + ' ≤ 20) — kombinasi sah!'; }
+    else { apStat.className = 'chip'; apStat.style.background = '#fee2e2'; apStat.style.color = '#991b1b'; apStat.style.borderColor = '#fecaca'; apStat.textContent = '❌ Melebihi anggaran! (' + tot + ' > 20) — kombinasi ditolak'; }
+  }
+  apX.addEventListener('input', upd); apY.addEventListener('input', upd); upd();
+  const btn = document.getElementById('apAll');
+  if(btn) btn.addEventListener('click', () => {
+    const list = [];
+    for(let x = 0; x <= 2; x++) for(let y = 0; y <= 4; y++) if(10 * x + 5 * y <= 20) list.push('(' + x + ',' + y + ')');
+    const box = document.getElementById('apCombos');
+    box.classList.add('show');
+    box.innerHTML = '<div class="qh">💡 Jawaban</div>Ada <b>' + list.length + ' kombinasi</b> yang memenuhi: ' + list.join(', ') + '. Semua titik (x, y) ini membentuk <b>daerah penyelesaian</b> — persis konsep yang akan kamu kuasai hari ini! 🎯';
+    btn.style.display = 'none';
+  });
+})();
+
+/* ============ 9. M1: KARTU FLIP ============ */
+(function(){
+  document.querySelectorAll('.appcard').forEach(c => {
+    const t = () => c.classList.toggle('flip');
+    c.addEventListener('click', t);
+    c.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); t(); } });
+  });
+})();
+
+/* ============ 10. M2: CERITA HIGHLIGHT ============ */
+(function(){
+  const parts = ['var', 'kendala', 'tujuan'];
+  function light(part){
+    document.querySelectorAll('#stage .hl').forEach(s => s.classList.remove('on-var', 'on-kendala', 'on-tujuan'));
+    document.querySelectorAll('#stage .modelrow[data-part]').forEach(r => r.classList.remove('hot-var', 'hot-kendala', 'hot-tujuan'));
+    if(!part) return;
+    document.querySelectorAll('#stage .hl[data-part="' + part + '"]').forEach(s => s.classList.add('on-' + part));
+    document.querySelectorAll('#stage .modelrow[data-part="' + part + '"]').forEach(r => r.classList.add('hot-' + part));
+  }
+  document.querySelectorAll('#stage .hl').forEach(s => s.addEventListener('click', () => {
+    const p = s.dataset.part;
+    light(s.classList.contains('on-' + p) ? null : p);
+  }));
+  document.querySelectorAll('#stage .modelrow[data-part]').forEach(r => r.addEventListener('click', () => {
+    const p = r.dataset.part;
+    light(r.classList.contains('hot-' + p) ? null : p);
+  }));
+})();
+
+/* ============ 11. AKORDEON LANGKAH ============ */
+document.querySelectorAll('.acc-h').forEach(h => h.addEventListener('click', () => h.parentElement.classList.toggle('open')));
+
+/* ============ 12. M3a: GRAFIK STATIS SEGITIGA ============ */
+try {
+  (function(){
+    const svg = document.getElementById('m3aSvg'); if(!svg) return;
+    const G = mkGraph(svg, {max: 10});
+    shade(G, feasiblePoly([{a:1,b:0,c:0,op:'ge'},{a:0,b:1,c:0,op:'ge'},{a:1,b:1,c:6,op:'le'}]), 'rgba(16,185,129,.24)', '#10b981', 2);
+    drawLine(G, 1, 1, 6, '#4f46e5', {label: 'x + y = 6'});
+    const pts = [[0,0,'O (0,0)'],[6,0,'A (6,0)'],[0,6,'B (0,6)']];
+    pts.forEach(p => {
+      dot(G, G.gTop, p[0], p[1], 7, '#4f46e5');
+      if(p[0] === 0 && p[1] === 0) lbl(G, G.gTop, 0.25, -0.55, p[2], '#3730a3', 12.5, 'start');
+      else if(p[0] === 0) lbl(G, G.gTop, 0.3, p[1] + 0.25, p[2], '#3730a3', 12.5, 'start');
+      else if(p[1] === 0) lbl(G, G.gTop, p[0], -0.6, p[2], '#3730a3', 12.5, 'middle');
+      else lbl(G, G.gTop, p[0] + 0.3, p[1] + 0.3, p[2], '#3730a3', 12.5, 'start');
+    });
+    lbl(G, G.gTop, 1.6, 1.5, 'DAERAH PENYELESAIAN', '#047857', 11.5);
+    lbl(G, G.gTop, 1.9, 2.4, '3 titik pojok ⭐', '#b45309', 11.5);
+  })();
+} catch(e) { console.error('m3a', e); }
+
+/* ============ 13. M3b: LAB TITIK POTONG ============ */
+try {
+  (function(){
+    const svg = document.getElementById('m3bSvg'); if(!svg) return;
+    const G = mkGraph(svg, {max: 10});
+    const out = document.getElementById('m3Out');
+    const LINES = [['x + y = 6',[1,1,6]],['2x + y = 8',[2,1,8]],['x − y = 2',[1,-1,2]],['x + 2y = 10',[1,2,10]],['y = 3',[0,1,3]],['x = 4',[1,0,4]]];
+    function drawPair(l1, l2, pt){
+      G.gClip.innerHTML = ''; G.gTop.innerHTML = '';
+      drawLine(G, l1[0], l1[1], l1[2], '#4f46e5', {label: 'Garis 1'});
+      drawLine(G, l2[0], l2[1], l2[2], '#ec4899', {label: 'Garis 2'});
+      if(pt){
+        dot(G, G.gTop, pt[0], pt[1], 9, '#f59e0b', 3);
+        lbl(G, G.gTop, pt[0], pt[1] + 0.75, '(' + fmt(pt[0]) + ', ' + fmt(pt[1]) + ') ⭐', '#92400e', 14);
+      }
+    }
+    const sel1 = document.getElementById('m3L1'), sel2 = document.getElementById('m3L2');
+    function readPair(){
+      const v1 = sel1.value.split(',').map(Number), v2 = sel2.value.split(',').map(Number);
+      drawPair(v1, v2, null);
+      out.style.display = 'none';
+    }
+    sel1.addEventListener('change', readPair);
+    sel2.addEventListener('change', readPair);
+    readPair();
+    document.getElementById('m3Go').addEventListener('click', () => {
+      const v1 = sel1.value.split(',').map(Number), v2 = sel2.value.split(',').map(Number);
+      const det = v1[0] * v2[1] - v2[0] * v1[1];
+      G.gTop.innerHTML = '';
+      if(Math.abs(det) < 1e-9){
+        drawPair(v1, v2, null);
+        out.style.display = 'block';
+        out.innerHTML = '⚠️ <b>Garis sejajar!</b> Determinan a₁b₂ − a₂b₁ = 0 → tidak ada titik potong. (Bila kedua persamaan berimpit, titik potongnya tak hingga banyak.) Coba pasangan garis yang tidak sejajar! 🔁';
+        return;
+      }
+      const x = (v1[2] * v2[1] - v2[2] * v1[1]) / det;
+      const y = (v1[0] * v2[2] - v2[0] * v1[2]) / det;
+      drawPair(v1, v2, [x, y]);
+      out.style.display = 'block';
+      out.innerHTML = '🪜 <b>Eliminasi:</b> a₁b₂ − a₂b₁ = ' + v1[0] + '×' + v2[1] + ' − ' + v2[0] + '×' + v1[1] + ' = ' + fmt(det) + '<br>'
+        + 'x = (c₁b₂ − c₂b₁)/(det) = (' + v1[2] + '×' + v2[1] + ' − ' + v2[2] + '×' + v1[1] + ')/' + fmt(det) + ' = <b>' + fmt(x) + '</b><br>'
+        + 'y = (a₁c₂ − a₂c₁)/(det) = (' + v1[0] + '×' + v2[2] + ' − ' + v2[0] + '×' + v1[2] + ')/' + fmt(det) + ' = <b>' + fmt(y) + '</b><br>'
+        + '⭐ Titik potong: <b>(' + fmt(x) + ', ' + fmt(y) + ')</b>' + ((x < 0 || x > 10 || y < 0 || y > 10) ? ' — di luar jendela grafik, tapi hitungannya valid!' : ' — cek dengan substitusi ke kedua persamaan ✓');
+    });
+  })();
+} catch(e) { console.error('m3b', e); }
+
+/* ============ 14. M4a: GRAFIK STATIS 2x+3y=12 ============ */
+try {
+  (function(){
+    const svg = document.getElementById('m4aSvg'); if(!svg) return;
+    const G = mkGraph(svg, {max: 10});
+    shade(G, feasiblePoly([{a:1,b:0,c:0,op:'ge'},{a:0,b:1,c:0,op:'ge'},{a:2,b:3,c:12,op:'le'}]), 'rgba(99,102,241,.18)', '#6366f1', 2);
+    drawLine(G, 2, 3, 12, '#4f46e5', {label: '2x + 3y = 12'});
+    dot(G, G.gTop, 6, 0, 7, '#f59e0b'); lbl(G, G.gTop, 6.1, 0.75, '(6, 0)', '#92400e', 13);
+    dot(G, G.gTop, 0, 4, 7, '#f59e0b'); lbl(G, G.gTop, 0.75, 4.15, '(0, 4)', '#92400e', 13, 'start');
+    dot(G, G.gTop, 0, 0, 6, '#10b981'); lbl(G, G.gTop, 0.55, 0.7, '(0,0) ✓ uji', '#047857', 11.5);
+    lbl(G, G.gTop, 2.1, 1.35, 'daerah memuat (0,0)', '#4338ca', 11);
+  })();
+} catch(e) { console.error('m4a', e); }
+</script>
+<script>
+/* ============ 15. M4b: STUDIO GRAFIK — DAERAH BERSIH vs KOTOR ============ */
+try {
+  (function(){
+    const svg = document.getElementById('m4Svg'); if(!svg) return;
+    const G = mkGraph(svg, {max: 10});
+    const pat = el('pattern', {id: 'hatchM4', width: 9, height: 9, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)'}, G.defs);
+    el('rect', {width: 9, height: 9, fill: 'rgba(239,68,68,.10)'}, pat);
+    el('line', {x1: 0, y1: 0, x2: 0, y2: 9, stroke: 'rgba(239,68,68,.8)', 'stroke-width': 2.6}, pat);
+    const PRESETS = [
+      {name: 'x + y ≤ 6', cons: [{a: 1, b: 1, c: 6, op: 'le', lbl: 'x + y ≤ 6'}]},
+      {name: '2x + y ≤ 8 dan x + y ≤ 6', cons: [{a: 2, b: 1, c: 8, op: 'le', lbl: '2x + y ≤ 8'}, {a: 1, b: 1, c: 6, op: 'le', lbl: 'x + y ≤ 6'}]},
+      {name: '3x + 2y ≤ 12 dan x + y ≤ 5', cons: [{a: 3, b: 2, c: 12, op: 'le', lbl: '3x + 2y ≤ 12'}, {a: 1, b: 1, c: 5, op: 'le', lbl: 'x + y ≤ 5'}]},
+      {name: 'x + 2y ≥ 8 dan x + y ≤ 6', cons: [{a: 1, b: 2, c: 8, op: 'ge', lbl: 'x + 2y ≥ 8'}, {a: 1, b: 1, c: 6, op: 'le', lbl: 'x + y ≤ 6'}]}
+    ];
+    const COLORS = ['#4f46e5', '#ec4899', '#f59e0b'];
+    let step = 0;
+    const log = document.getElementById('m4Log');
+    const b1 = document.getElementById('m4S1'), b2 = document.getElementById('m4S2'), b3 = document.getElementById('m4S3');
+    const presetSel = document.getElementById('m4Preset');
+    function mode(){ const r = document.querySelector('input[name="m4mode"]:checked'); return r ? r.value : 'bersih'; }
+    function logAdd(html){ const d = document.createElement('div'); d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+    function draw(){
+      G.gClip.innerHTML = ''; G.gTop.innerHTML = '';
+      const P = PRESETS[+presetSel.value];
+      if(step >= 1){
+        P.cons.forEach((c, i) => drawLine(G, c.a, c.b, c.c, COLORS[i % COLORS.length], {label: c.lbl, w: 4}));
+        shade(G, feasiblePoly([{a:1,b:0,c:0,op:'ge'},{a:0,b:1,c:0,op:'ge'}]), 'rgba(148,163,184,.06)', '#cbd5e1', 1);
+      }
+      if(step >= 2){
+        dot(G, G.gTop, 0, 0, 6.5, '#f59e0b', 3);
+        P.cons.forEach((c, i) => {
+          const v = 0, sat = c.op === 'ge' ? v >= c.c : v <= c.c;
+          const bx = G.X(5.6), by = G.Y(9.55 - i * 0.95);
+          el('rect', {x: bx, y: by - 14, width: 238, height: 24, rx: 9, fill: sat ? 'rgba(16,185,129,.15)' : 'rgba(239,68,68,.15)', stroke: sat ? '#10b981' : '#ef4444', 'stroke-width': 1.4}, G.gTop);
+          const t = el('text', {x: bx + 9, y: by + 3, 'font-size': 11.5, 'font-weight': 700, fill: sat ? '#065f46' : '#991b1b', 'font-family': 'Poppins, sans-serif'}, G.gTop);
+          t.textContent = c.a + '(0) + ' + c.b + '(0) = ' + v + (c.op === 'ge' ? ' ≥ ' : ' ≤ ') + c.c + (sat ? '  ✓ benar' : '  ✗ salah');
+        });
+      }
+      if(step >= 3){
+        const m = mode();
+        const feas = feasiblePoly(P.cons);
+        if(m === 'kotor'){
+          P.cons.forEach((c, i) => {
+            let poly = [[0, 0], [10, 0], [10, 10], [0, 10]];
+            poly = clipHalf(poly, c.a, c.b, c.c, !(c.op === 'ge'));
+            poly = cleanPoly(poly);
+            if(poly.length){
+              const p = shade(G, poly, 'url(#hatchM4)', 'rgba(239,68,68,.65)', 1.4);
+              if(p){ p.style.animation = 'fadeUp .55s both'; p.style.animationDelay = (i * 0.5) + 's'; }
+            }
+          });
+        }
+        if(feas.length){
+          if(m === 'bersih') shade(G, feas, 'rgba(16,185,129,.32)', '#059669', 2.6);
+          else {
+            const o = el('polygon', {points: polyPts(feas, G), fill: 'none', stroke: '#059669', 'stroke-width': 3, 'stroke-linejoin': 'round'}, G.gClip);
+            o.style.animation = 'pop .5s both .9s';
+          }
+          const cx = feas.reduce((s, p) => s + p[0], 0) / feas.length;
+          const cy = feas.reduce((s, p) => s + p[1], 0) / feas.length;
+          feas.forEach(v => {
+            dot(G, G.gTop, v[0], v[1], 5.5, '#4f46e5', 2);
+            const dx = v[0] - cx, dy = v[1] - cy, L = Math.hypot(dx, dy) || 1;
+            let lx = v[0] + dx / L * 0.85, ly = v[1] + dy / L * 0.75;
+            lx = Math.max(0.15, Math.min(9.85, lx));
+            ly = Math.max(0.3, Math.min(9.7, ly));
+            const anc = lx < 1.3 ? 'start' : (lx > 8.7 ? 'end' : 'middle');
+            lbl(G, G.gTop, lx, ly, '(' + fmt(v[0]) + ', ' + fmt(v[1]) + ')', '#4338ca', 12, anc);
+          });
+          lbl(G, G.gTop, Math.max(1.7, Math.min(8.3, cx)), Math.max(0.55, Math.min(9.45, cy)), m === 'bersih' ? 'DAERAH PENYELESAIAN ✓' : 'SISA BERSIH = PENYELESAIAN ✓', m === 'bersih' ? '#065f46' : '#b91c1c', 12.5);
+        }
+      }
+    }
+    function reset(){
+      step = 0; log.innerHTML = '<div>👋 Klik <b>1️⃣ Gambar Garis</b> untuk memulai. Sistem menuntunmu langkah demi langkah.</div>';
+      b1.disabled = false; b2.disabled = true; b3.disabled = true;
+      draw();
+    }
+    b1.addEventListener('click', () => { if(step < 1){ step = 1; b2.disabled = false; logAdd('📐 <b>Langkah 1:</b> garis batas digambar <b>penuh</b> (tanda ≤/≥) — tiap kendala satu warna.'); draw(); } });
+    b2.addEventListener('click', () => { if(step < 2){ step = 2; b3.disabled = false; logAdd('🧪 <b>Langkah 2:</b> uji titik <b>(0,0)</b> ke setiap kendala — lihat hasil ✓/✗ di kotak kanan atas!'); draw(); } });
+    b3.addEventListener('click', () => {
+      if(step < 3){
+        step = 3; const m = mode();
+        if(m === 'bersih') logAdd('🟢 <b>Langkah 3 (Daerah Bersih):</b> arsir langsung <b>irisan</b> semua sisi yang memenuhi kendala (hijau). Titik biru = titik pojok, kandidat nilai optimum!');
+        else logAdd('🔴 <b>Langkah 3 (Daerah Kotor):</b> coret satu per satu sisi yang <b>ditolak</b> tiap kendala. Area yang tersisa bersih (tak tercoret) itulah daerah penyelesaiannya!');
+        draw();
+      }
+    });
+    presetSel.addEventListener('change', reset);
+    document.querySelectorAll('input[name="m4mode"]').forEach(r => r.addEventListener('change', () => { if(step >= 3) draw(); }));
+    document.getElementById('m4Reset').addEventListener('click', reset);
+    reset();
+  })();
+} catch(e) { console.error('m4b', e); }
+
+/* ============ 16. M5b: SIMULASI NILAI OPTIMUM ============ */
+try {
+  (function(){
+    const svg = document.getElementById('m5Svg'); if(!svg) return;
+    const G = mkGraph(svg, {max: 10});
+    const CONS = [{a: 1, b: 0, c: 0, op: 'ge'}, {a: 0, b: 1, c: 0, op: 'ge'}, {a: 1, b: 1, c: 6, op: 'le'}, {a: 2, b: 1, c: 8, op: 'le'}];
+    const PTS = [[0, 0, 'O'], [4, 0, 'A'], [2, 4, 'B'], [0, 6, 'C']];
+    const feas = feasiblePoly(CONS);
+    shade(G, feas, 'rgba(16,185,129,.22)', '#10b981', 2.4);
+    drawLine(G, 1, 1, 6, '#4f46e5', {label: 'x + y = 6'});
+    drawLine(G, 2, 1, 8, '#ec4899', {label: '2x + y = 8'});
+    const gDots = el('g', {}, G.gTop);
+    const aIn = document.getElementById('m5a'), bIn = document.getElementById('m5b');
+    const tbody = document.getElementById('m5Table');
+    const msg = document.getElementById('m5Msg');
+    let order = [];
+    function vals(){
+      const a = +aIn.value || 0, b = +bIn.value || 0;
+      return PTS.map(p => ({i: PTS.indexOf(p), x: p[0], y: p[1], name: p[2], v: a * p[0] + b * p[1]}));
+    }
+    function renderDots(){
+      gDots.innerHTML = '';
+      const vs = vals().filter(v => order.includes(v.i));
+      let maxI = -1, minI = -1;
+      if(vs.length){ maxI = vs.reduce((m, v) => v.v > vs[m].v ? vs.indexOf(v) : m, 0); if(vs.length > 1) minI = vs.reduce((m, v) => v.v < vs[m].v ? vs.indexOf(v) : m, 0); }
+      PTS.forEach((p, i) => {
+        if(!order.includes(i)){ return; }
+        const isMax = vs[maxI] && vs[maxI].i === i, isMin = vs.length > 1 && vs[minI] && vs[minI].i === i;
+        if(isMax) el('circle', {cx: G.X(p[0]), cy: G.Y(p[1]), r: 16, fill: 'rgba(245,158,11,.28)', stroke: '#f59e0b', 'stroke-width': 3}, gDots);
+        dot(G, gDots, p[0], p[1], isMax ? 11 : 9, isMax ? '#f59e0b' : '#8b5cf6', 3);
+        lbl(G, gDots, p[0], p[1] + 0.72, p[2] + '(' + p[0] + ',' + p[1] + ')' + (isMax ? ' ⭐' : ''), isMax ? '#92400e' : '#5b21b6', 12.5);
+      });
+    }
+    function renderTable(){
+      const a = +aIn.value || 0, b = +bIn.value || 0;
+      const vs = vals().filter(v => order.includes(v.i));
+      let maxI = -1, minI = -1;
+      if(vs.length){ maxI = vs.reduce((m, v) => v.v > vs[m].v ? vs.indexOf(v) : m, 0); if(vs.length > 1) minI = vs.reduce((m, v) => v.v < vs[m].v ? vs.indexOf(v) : m, 0); }
+      let html = '<tr><th>Titik</th><th>Perhitungan</th><th>f</th><th></th></tr>';
+      if(!vs.length) html += '<tr id="m5Empty"><td colspan="4" class="muted">Belum ada titik yang diklik… mulai dari O(0,0)! 🙂</td></tr>';
+      vs.forEach((v, k) => {
+        html += '<tr' + (k === maxI ? ' class="hl"' : '') + '><td><b>' + v.name + '(' + v.x + ',' + v.y + ')</b></td><td>' + a + '(' + v.x + ') + ' + b + '(' + v.y + ')</td><td><b>' + fmt(v.v) + '</b></td><td>' + (k === maxI ? '⭐ maks' : (k === minI ? '⬇️ min' : '')) + '</td></tr>';
+      });
+      tbody.innerHTML = html;
+      if(vs.length){
+        const mx = vs[maxI];
+        let m = '⭐ <b>Nilai MAKSIMUM sejauh ini: f = ' + fmt(mx.v) + '</b> di titik ' + mx.name + '(' + mx.x + ',' + mx.y + ')';
+        if(vs.length > 1){ const mn = vs[minI]; m += '<br>⬇️ Minimum: f = ' + fmt(mn.v) + ' di ' + mn.name + '(' + mn.x + ',' + mn.y + ')'; }
+        if(vs.length === 4) m += '<br>🎉 Empat titik sudah dikunjungi — perbandingan lengkap!';
+        msg.style.display = 'block'; msg.innerHTML = m;
+      } else { msg.style.display = 'none'; }
+      renderDots();
+    }
+    PTS.forEach((p, i) => {
+      const c = el('circle', {cx: G.X(p[0]), cy: G.Y(p[1]), r: 13, fill: 'rgba(139,92,246,.18)', stroke: '#8b5cf6', 'stroke-width': 2.5, cursor: 'pointer'}, G.gTop);
+      c.addEventListener('click', () => { if(!order.includes(i)) order.push(i); renderTable(); });
+      c.addEventListener('mouseenter', () => c.setAttribute('fill', 'rgba(139,92,246,.4)'));
+      c.addEventListener('mouseleave', () => c.setAttribute('fill', 'rgba(139,92,246,.18)'));
+      lbl(G, G.gTop, p[0], p[1] + 0.95, p[2] + '(' + p[0] + ',' + p[1] + ')', '#7c3aed', 12);
+    });
+    aIn.addEventListener('input', renderTable);
+    bIn.addEventListener('input', renderTable);
+    document.getElementById('m5All').addEventListener('click', () => { order = [0, 1, 2, 3]; renderTable(); });
+    document.getElementById('m5Clr').addEventListener('click', () => { order = []; renderTable(); });
+    renderTable();
+  })();
+} catch(e) { console.error('m5', e); }
+</script>
+<script>
+/* ============ 17. M6b: GRAFIK STATIS DETEKTIF ============ */
+try {
+  (function(){
+    function draw1(){
+      const svg = document.getElementById('m6Svg1'); if(!svg) return;
+      const G = mkGraph(svg, {max: 6, ml: 34, mb: 30});
+      shade(G, feasiblePoly([{a:1,b:0,c:0,op:'ge'},{a:0,b:1,c:0,op:'ge'},{a:1,b:1,c:2,op:'le'}], 6), 'rgba(16,185,129,.3)', '#10b981', 2);
+      drawLine(G, 1, 1, 2, '#4f46e5', {label: 'x + y = 2', w: 4});
+      dot(G, G.gTop, 0, 0, 5, '#f59e0b'); lbl(G, G.gTop, 0.35, 0.45, '(0,0) ✓', '#92400e', 11, 'start');
+    }
+    function draw2(){
+      const svg = document.getElementById('m6Svg2'); if(!svg) return;
+      const G = mkGraph(svg, {max: 7, ml: 34, mb: 30});
+      shade(G, feasiblePoly([{a:1,b:0,c:0,op:'ge'},{a:0,b:1,c:0,op:'ge'},{a:2,b:3,c:12,op:'ge'}], 7), 'rgba(16,185,129,.3)', '#10b981', 2);
+      drawLine(G, 2, 3, 12, '#ec4899', {label: '2x + 3y = 12', w: 4});
+      dot(G, G.gTop, 1, 5.5, 5, '#f59e0b'); lbl(G, G.gTop, 1.15, 5.9, 'titik uji: 0 ≥ 12 ✗', '#92400e', 10.5, 'start');
+    }
+    function draw3(){
+      const svg = document.getElementById('m6Svg3'); if(!svg) return;
+      const G = mkGraph(svg, {max: 7, ml: 34, mb: 30});
+      shade(G, feasiblePoly([{a:1,b:0,c:0,op:'ge'},{a:0,b:1,c:0,op:'ge'},{a:0,b:1,c:3,op:'le'}], 7), 'rgba(16,185,129,.3)', '#10b981', 2);
+      drawLine(G, 0, 1, 3, '#f59e0b', {label: 'y = 3', w: 4});
+      dot(G, G.gTop, 1, 1, 5, '#10b981'); lbl(G, G.gTop, 1.15, 0.72, '(1,1): 1 ≤ 3 ✓', '#047857', 10.5, 'start');
+    }
+    draw1(); draw2(); draw3();
+  })();
+} catch(e) { console.error('m6', e); }
+
+/* ============ 18. M6: TOGGLE PEMBAHASAN ============ */
+window.m6Toggle = function(id, btn){
+  const d = document.getElementById(id);
+  const open = d.classList.toggle('show');
+  btn.textContent = open ? '🔐 Sembunyikan Pembahasan' : '🔓 Lihat Pembahasan';
+};
+
+/* ============ 19. M7b: GRAFIK STATIS SOAL CERITA ============ */
+try {
+  (function(){
+    const svg = document.getElementById('m7Svg'); if(!svg) return;
+    const G = mkGraph(svg, {max: 10});
+    shade(G, feasiblePoly([{a:1,b:0,c:0,op:'ge'},{a:0,b:1,c:0,op:'ge'},{a:2,b:1,c:12,op:'le'},{a:1,b:1,c:8,op:'le'}]), 'rgba(99,102,241,.2)', '#6366f1', 2.4);
+    drawLine(G, 2, 1, 12, '#4f46e5', {label: '2x + y = 12 (tepung)'});
+    drawLine(G, 1, 1, 8, '#ec4899', {label: 'x + y = 8 (oven)'});
+    [[0,0,'O'],[6,0,'A'],[4,4,'B'],[0,8,'C']].forEach(p => {
+      dot(G, G.gTop, p[0], p[1], 6, '#4f46e5', 2.2);
+      if(p[0] === 0 && p[1] === 0) lbl(G, G.gTop, 0.3, -0.5, 'O (0,0)', '#3730a3', 11.5, 'start');
+      else if(p[0] === 0) lbl(G, G.gTop, 0.35, p[1] + 0.25, 'C (0,8)', '#3730a3', 11.5, 'start');
+      else lbl(G, G.gTop, p[0] + 0.1, p[1] === 0 ? -0.55 : p[1] + 0.45, p[2] + '(' + p[0] + ',' + p[1] + ')', '#3730a3', 11.5, 'middle');
+    });
+    lbl(G, G.gTop, 2.1, 2.6, 'daerah penyelesaian', '#4338ca', 11.5);
+  })();
+} catch(e) { console.error('m7', e); }
+
+/* ============ 20. REFLEKSI: MOOD, CHECKLIST, SIMPAN ============ */
+(function(){
+  const moods = document.querySelectorAll('#moodRow .mood');
+  const msg = document.getElementById('moodMsg');
+  let moodTxt = '';
+  moods.forEach(m => m.addEventListener('click', () => {
+    moods.forEach(x => x.classList.remove('sel'));
+    m.classList.add('sel');
+    moodTxt = m.dataset.m;
+    msg.style.display = 'inline-flex';
+    msg.textContent = moodTxt;
+  }));
+  document.querySelectorAll('#tpCheck input').forEach(cb => cb.addEventListener('change', () => cb.closest('.checkline').classList.toggle('done', cb.checked)));
+  const save = document.getElementById('saveRef');
+  if(save) save.addEventListener('click', () => {
+    const g = id => (document.getElementById(id) ? document.getElementById(id).value : '');
+    const tp = Array.from(document.querySelectorAll('#tpCheck input')).filter(cb => cb.checked).length;
+    const lines = [
+      '=== REFLEKSI BELAJAR: PROGRAM LINEAR (KELAS X) ===',
+      'Tanggal: ' + new Date().toLocaleString('id-ID'),
+      '',
+      '1. Mood belajar: ' + (moodTxt || '(belum dipilih)'),
+      '',
+      '2. Ceklis kemampuan (tercentang ' + tp + ' dari 6):'
+    ];
+    document.querySelectorAll('#tpCheck label').forEach(l => lines.push('   [' + (l.querySelector('input').checked ? 'v' : ' ') + '] ' + l.textContent.trim()));
+    lines.push('', '3. Materi paling menarik / dikuasai:', '   ' + (g('r1') || '-'));
+    lines.push('', '4. Bagian yang masih membingungkan:', '   ' + (g('r2') || '-'));
+    lines.push('', '5. Pertanyaan yang tersisa:', '   ' + (g('r3') || '-'));
+    lines.push('', '— Sampai jumpa di penguatan berikutnya! 🌟');
+    const blob = new Blob([lines.join('\n')], {type: 'text/plain;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'refleksi-program-linear.txt';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 400);
+    const rm = document.getElementById('refMsg');
+    if(rm) rm.style.display = 'inline-flex';
+  });
+})();
+
+/* ============ 21. KONFETI ============ */
+(function(){
+  const btn = document.getElementById('confBtn');
+  if(!btn) return;
+  const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
+  btn.addEventListener('click', () => {
+    for(let i = 0; i < 130; i++){
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      const s = 6 + Math.random() * 8;
+      c.style.cssText = 'left:' + (Math.random() * 100) + 'vw;width:' + s + 'px;height:' + (s * 0.6) + 'px;background:' + COLORS[i % COLORS.length] + ';animation-duration:' + (2.2 + Math.random() * 1.8) + 's;animation-delay:' + (Math.random() * 0.5) + 's;transform:rotate(' + (Math.random() * 360) + 'deg)';
+      document.body.appendChild(c);
+      c.addEventListener('animationend', () => c.remove());
+    }
+  });
+})();
+
+/* ============ 21b. TATA LETAK CHECKLINE (satukan isi dalam satu span) ============ */
+document.querySelectorAll('.checkline').forEach(c => {
+  const nodes = Array.from(c.childNodes).filter(n => !(n.nodeType === 1 && n.tagName === 'INPUT'));
+  if(nodes.length <= 1) return;
+  const span = document.createElement('span');
+  span.style.flex = '1';
+  c.insertBefore(span, nodes[0]);
+  nodes.forEach(n => span.appendChild(n));
+});
+
+/* ============ 22. MULAI ============ */
+buildToc();
+go(0);
+</script>
+</body>
+</html>
